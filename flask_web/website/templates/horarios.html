@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Horarios{% endblock %}
+
+{% block content %}
+<h2>Horarios Disponibles</h2>
+<ul>
+    {% for medico, horarios in horarios.items() %}
+    <li>{{ medico }}:
+        <ul>
+            {% for horario in horarios %}
+            <li>{{ horario }}</li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

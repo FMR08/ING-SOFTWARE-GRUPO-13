@@ -1,0 +1,13 @@
+<!-- flask_web/website/templates/medicos.html -->
+{% extends 'base.html' %}
+
+{% block title %}Médicos{% endblock %}
+
+{% block content %}
+<h2>Médicos Disponibles</h2>
+<ul>
+    {% for medico in medicos %}
+    <li>{{ medico.nombre }} - Especialidad: {{ medico.especialidad }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

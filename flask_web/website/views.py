@@ -10,6 +10,6 @@ def home():
 def reservas():
     return render_template("reservas.html")
 
-@views.route('/schedule')
-def horario():
-    return render_template("horario.html")
+@views.route('/specialist')
+def especialistas():
+    return render_template("especialistas.html")

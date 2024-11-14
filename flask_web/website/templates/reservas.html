@@ -11,18 +11,6 @@
             padding: 0;
             background-color: #f4f4f4;
         }
-        .back-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-        }
         .container {
             max-width: 600px;
             margin: 50px auto;
@@ -30,6 +18,7 @@
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
+            position: relative;
         }
         h2 {
             text-align: center;
@@ -40,24 +29,52 @@
             margin-bottom: 8px;
             font-weight: bold;
         }
-        input[type="text"], input[type="date"], input[type="time"], select, textarea {
+        input[type="text"], input[type="date"], input[type="time"], textarea {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        button {
-            width: 100%;
+        .button-container {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+        .reserve-btn, .view-specialists-btn {
             padding: 10px;
-            background-color: #4CAF50;
+            width: 100%;
             color: white;
             border: none;
             border-radius: 4px;
             font-size: 16px;
         }
-        button:hover {
+        .reserve-btn {
+            background-color: #4CAF50;
+        }
+        .reserve-btn:hover {
             background-color: #45a049;
+        }
+        .view-specialists-btn {
+            background-color: #007bff;
+        }
+        .view-specialists-btn:hover {
+            background-color: #0069d9;
+        }
+        #back-to-home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+        #back-to-home-btn:hover {
+            background-color: #5a6268;
         }
         #idCita {
             margin-top: 20px;
@@ -66,22 +83,22 @@
             color: #333;
             text-align: center;
         }
+        /* Ocultar el ícono de reloj en el campo de tiempo */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            display: none;
+            -webkit-appearance: none;
+        }
     </style>
 </head>
-<body>
-
-<!-- Botón para volver a la página principal en la esquina superior derecha -->
-<button onclick="location.href='{{ url_for('views.home') }}'" class="back-button">
-    Volver a Inicio
-</button>
+<body onload="restoreFormData()">
 
 <div class="container">
+    <button id="back-to-home-btn" onclick="location.href='{{ url_for('views.home') }}'">Volver al Inicio</button>
     <h2>Reserva tu Cita Médica</h2>
     <form id="formulario" onsubmit="generarIdCita(event)">
-        <!-- Campos del formulario -->
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" name="nombre" required>
-        
+
         <label for="apellidos">Apellidos:</label>
         <input type="text" id="apellidos" name="apellidos" required>
 
@@ -91,21 +108,18 @@
         <label for="hora">Hora de la Cita:</label>
         <input type="time" id="hora" name="hora" required min="08:00" max="22:00" step="3600">
 
-        <label for="motivo">Motivo de Consulta:</label>
-        <textarea id="motivo" name="motivo" rows="4" required></textarea>
+        <label for="motivo">Motivo de la consulta:</label>
+        <textarea id="motivo" name="motivo" maxlength="250" placeholder="Describa el motivo de su consulta (máximo 250 caracteres)"></textarea>
 
-        <label for="especialista">Especialista:</label>
-        <select id="especialista" name="especialista" required>
-            <option value="">Seleccionar especialista</option>
-            <option value="general">Médico General</option>
-            <option value="cirujano">Cirujano</option>
-            <option value="dermatologo">Dermatólogo</option>
-            <option value="neurologo">Neurólogo</option>
-            <option value="pediatra">Pediatra</option>
-            <option value="ginecologo">Ginecólogo</option>
-        </select>
+        <label>Especialista:</label>
+        <p id="selected-specialist">Especialista no seleccionado</p>
 
-        <button type="submit">Reservar Cita</button>
+        <div class="button-container">
+            <button type="button" onclick="saveFormData(); location.href='{{ url_for('views.especialistas') }}'" class="view-specialists-btn">
+                Ver Especialistas
+            </button>
+            <button type="submit" class="reserve-btn">Reservar Cita</button>
+        </div>
     </form>
 
     <div id="idCita" style="display:none;">
@@ -115,24 +129,44 @@
 </div>
 
 <script>
-    // Función para generar el ID de la cita
+    function saveFormData() {
+        const formData = {
+            nombre: document.getElementById('nombre').value,
+            apellidos: document.getElementById('apellidos').value,
+            fecha: document.getElementById('fecha').value,
+            hora: document.getElementById('hora').value,
+            motivo: document.getElementById('motivo').value
+        };
+        localStorage.setItem('formData', JSON.stringify(formData));
+    }
+
+    function restoreFormData() {
+        const formData = JSON.parse(localStorage.getItem('formData') || '{}');
+        document.getElementById('nombre').value = formData.nombre || '';
+        document.getElementById('apellidos').value = formData.apellidos || '';
+        document.getElementById('fecha').value = formData.fecha || '';
+        document.getElementById('hora').value = formData.hora || '';
+        document.getElementById('motivo').value = formData.motivo || '';
+
+        const selectedSpecialist = localStorage.getItem('selectedSpecialist') || 'Especialista no seleccionado';
+        document.getElementById('selected-specialist').textContent = selectedSpecialist;
+    }
+
     function generarIdCita(event) {
+        const specialist = localStorage.getItem('selectedSpecialist');
+        if (!specialist || specialist === 'Especialista no seleccionado') {
+            alert('Por favor, seleccione un especialista antes de reservar la cita.');
+            event.preventDefault();
+            return;
+        }
+        
         event.preventDefault();
-
-        const nombre = document.getElementById('nombre').value;
-        const apellidos = document.getElementById('apellidos').value;
-        const fecha = document.getElementById('fecha').value;
-        const hora = document.getElementById('hora').value;
-
-        const fechaHora = new Date(fecha + 'T' + hora);
-        const timestamp = fechaHora.getTime();
-        const randomNum = Math.floor(Math.random() * 1000);
-        const citaId = `CITA-${timestamp}-${randomNum}`;
-
-        document.getElementById('citaId').textContent = citaId;
-        document.getElementById('idCita').style.display = 'block';
-
-        document.getElementById('formulario').reset();
+        const idCita = Math.random().toString(36).substring(2, 10).toUpperCase();
+        document.getElementById("idCita").style.display = 'block';
+        document.getElementById("citaId").innerText = idCita;
+        document.getElementById("formulario").reset();
+        localStorage.removeItem('formData');
+        localStorage.removeItem('selectedSpecialist');
     }
 </script>
 

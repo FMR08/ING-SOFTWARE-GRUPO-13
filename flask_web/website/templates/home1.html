@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Principal</title>
+    <style>
+        .go-to-reservas-button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Bienvenido a la Página Principal</h1>
+<button onclick="location.href='{{ url_for('views.reservas') }}'" class="go-to-reservas-button">
+    Ir a Reservas
+</button>
+
+</body>
+</html>
+

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horarios Disponibles de Médicos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .filters {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Horarios Disponibles de Médicos</h1>
+
+        <div class="filters row">
+            <div class="col-md-6">
+                <label for="filterSpecialty" class="form-label">Filtrar por Especialidad:</label>
+                <select id="filterSpecialty" class="form-select">
+                    <option value="">Todas</option>
+                    <option value="Cardiología">Cardiología</option>
+                    <option value="Pediatría">Pediatría</option>
+                    <option value="Dermatología">Dermatología</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="filterDay" class="form-label">Filtrar por Día:</label>
+                <select id="filterDay" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="Lunes">Lunes</option>
+                    <option value="Martes">Martes</option>
+                    <option value="Miércoles">Miércoles</option>
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                </select>
+            </div>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre del Médico</th>
+                    <th>Especialidad</th>
+                    <th>Día</th>
+                    <th>Horario Disponible</th>
+                    <th>Seleccionar</th>
+                </tr>
+            </thead>
+            <tbody id="scheduleTable">
+                <!-- Ejemplo de datos -->
+                <tr>
+                    <td>Dr. Juan Pérez</td>
+                    <td>Cardiología</td>
+                    <td>Lunes</td>
+                    <td>10:00 AM - 11:00 AM</td>
+                    <td><button class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
+                </tr>
+                <tr>
+                    <td>Dra. Ana López</td>
+                    <td>Pediatría</td>
+                    <td>Martes</td>
+                    <td>11:30 AM - 12:30 PM</td>
+                    <td><button class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
+                </tr>
+                <tr>
+                    <td>Dr. Carlos García</td>
+                    <td>Dermatología</td>
+                    <td>Miércoles</td>
+                    <td>9:00 AM - 10:00 AM</td>
+                    <td><button class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
+                </tr>
+                <!-- Fin de ejemplo -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const specialtyFilter = document.getElementById('filterSpecialty');
+            const dayFilter = document.getElementById('filterDay');
+            const tableRows = document.querySelectorAll('#scheduleTable tr');
+
+            function filterTable() {
+                const selectedSpecialty = specialtyFilter.value.toLowerCase();
+                const selectedDay = dayFilter.value.toLowerCase();
+
+                tableRows.forEach(row => {
+                    const specialty = row.cells[1].textContent.toLowerCase();
+                    const day = row.cells[2].textContent.toLowerCase();
+
+                    if (
+                        (selectedSpecialty === "" || specialty === selectedSpecialty) &&
+                        (selectedDay === "" || day === selectedDay)
+                    ) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+
+            specialtyFilter.addEventListener('change', filterTable);
+            dayFilter.addEventListener('change', filterTable);
+
+            document.querySelectorAll('.select-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const row = event.target.closest('tr');
+                    const doctorName = row.cells[0].textContent;
+                    const specialty = row.cells[1].textContent;
+                    const day = row.cells[2].textContent;
+                    const schedule = row.cells[3].textContent;
+                    alert(`Has seleccionado:\nMédico: ${doctorName}\nEspecialidad: ${specialty}\nDía: ${day}\nHorario: ${schedule}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

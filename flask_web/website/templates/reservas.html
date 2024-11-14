@@ -88,6 +88,11 @@
             display: none;
             -webkit-appearance: none;
         }
+        /* Ocultar el ícono de calendario en el campo de fecha */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none;
+            -webkit-appearance: none;
+        }
     </style>
 </head>
 <body onload="restoreFormData()">
@@ -168,6 +173,17 @@
         localStorage.removeItem('formData');
         localStorage.removeItem('selectedSpecialist');
     }
+
+    // Configura el mínimo para que sea el día siguiente al actual
+    const fechaInput = document.getElementById('fecha');
+    const hoy = new Date();
+    hoy.setDate(hoy.getDate() + 1);  // Establece el día siguiente
+
+    // Formato de fecha YYYY-MM-DD
+    const year = hoy.getFullYear();
+    const month = String(hoy.getMonth() + 1).padStart(2, '0');
+    const day = String(hoy.getDate()).padStart(2, '0');
+    fechaInput.min = `${year}-${month}-${day}`;
 </script>
 
 </body>

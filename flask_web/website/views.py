@@ -13,3 +13,7 @@ def reservas():
 @views.route('/specialist')
 def especialistas():
     return render_template("especialistas.html")
+
+@views.route('/specialist-list')
+def lista_especialistas():
+    return render_template("lista_especialistas.html")

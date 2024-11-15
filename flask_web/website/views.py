@@ -17,3 +17,7 @@ def especialistas():
 @views.route('/specialist-list')
 def lista_especialistas():
     return render_template("lista_especialistas.html")
+
+@views.route('/schedule')
+def horario():
+    return render_template("horario.html")

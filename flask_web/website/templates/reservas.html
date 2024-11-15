@@ -9,12 +9,12 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #d3d3d3; /* Fondo gris */
         }
         .container {
             max-width: 600px;
             margin: 50px auto;
-            background-color: #fff;
+            background-color: #fff5d8;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -29,13 +29,25 @@
             margin-bottom: 8px;
             font-weight: bold;
         }
+        /* Estilos de los campos de entrada para hacerlos más cortos */
         input[type="text"], input[type="date"], input[type="time"], textarea {
-            width: 100%;
+            width: 100%;  /* Ancho completo */
+            max-width: 100%;  /* Para que no se extiendan más de lo necesario */
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+        /* Ajustar los márgenes de los campos para que tengan el mismo espaciado */
+        .container input[type="text"],
+        .container input[type="date"],
+        .container input[type="time"],
+        .container textarea {
+            max-width: 96.4%;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
         .button-container {
             display: flex;
             gap: 10px;
@@ -49,7 +61,7 @@
             border: none;
             border-radius: 4px;
             font-size: 16px;
-            cursor: pointer; /* Cambia el cursor a mano al pasar sobre el botón */
+            cursor: pointer;
         }
         .reserve-btn {
             background-color: #4CAF50;
@@ -73,7 +85,7 @@
             border-radius: 4px;
             padding: 8px 16px;
             font-size: 14px;
-            cursor: pointer; /* Cambia el cursor a mano al pasar sobre el botón */
+            cursor: pointer;
         }
         #back-to-home-btn:hover {
             background-color: #5a6268;

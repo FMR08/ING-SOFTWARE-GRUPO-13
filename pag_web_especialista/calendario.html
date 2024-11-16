@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Interactivo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+    
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        .calendar-container {
+            width: 600px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .day-cell {
+            cursor: pointer;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            transition: background-color 0.3s;
+        }
+
+        .day-cell:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .schedule-panel {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .day-header {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        select {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calendar-container">
+        <!-- Encabezado del calendario -->
+        <div class="calendar-header">
+            <div>
+                <label for="year-select">Año:</label>
+                <select id="year-select" onchange="actualizarCalendario()">
+                    <!-- Opciones de año generadas dinámicamente -->
+                </select>
+
+                <label for="month-select">Mes:</label>
+                <select id="month-select" onchange="actualizarCalendario()">
+                    <option value="0">Enero</option>
+                    <option value="1">Febrero</option>
+                    <option value="2">Marzo</option>
+                    <option value="3">Abril</option>
+                    <option value="4">Mayo</option>
+                    <option value="5">Junio</option>
+                    <option value="6">Julio</option>
+                    <option value="7">Agosto</option>
+                    <option value="8">Septiembre</option>
+                    <option value="9">Octubre</option>
+                    <option value="10">Noviembre</option>
+                    <option value="11">Diciembre</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Días de la semana -->
+        <div class="calendar-grid">
+            <div class="day-header">Lun</div>
+            <div class="day-header">Mar</div>
+            <div class="day-header">Mié</div>
+            <div class="day-header">Jue</div>
+            <div class="day-header">Vie</div>
+            <div class="day-header">Sáb</div>
+            <div class="day-header">Dom</div>
+        </div>
+
+        <!-- Días del calendario -->
+        <div class="calendar-grid" id="calendar-days"></div>
+
+        <!-- Panel de horarios -->
+        <div class="schedule-panel" id="schedule-panel">
+            <h5 id="selected-day"></h5>
+            <ul>
+                <li>Horario 1: Información no disponible</li>
+                <li>Horario 2: Información no disponible</li>
+                <li>Horario 3: Información no disponible</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        const maxYear = 3000;
+        const minYear = 2024;
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+        // Generar opciones para el selector de años
+        const yearSelect = document.getElementById('year-select');
+        for (let year = minYear; year <= maxYear; year++) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        }
+
+        function generarCalendario(mes, año) {
+            const calendarDays = document.getElementById("calendar-days");
+            calendarDays.innerHTML = '';
+
+            const primerDia = new Date(año, mes, 1).getDay();
+            const totalDias = new Date(año, mes + 1, 0).getDate();
+            const primerDiaAjustado = (primerDia === 0) ? 6 : primerDia - 1;
+
+            for (let i = 0; i < primerDiaAjustado; i++) {
+                const emptyCell = document.createElement("div");
+                calendarDays.appendChild(emptyCell);
+            }
+
+            for (let dia = 1; dia <= totalDias; dia++) {
+                const dayCell = document.createElement("div");
+                dayCell.classList.add("day-cell");
+                dayCell.textContent = dia;
+                dayCell.onclick = () => mostrarHorarios(dia, mes, año);
+                calendarDays.appendChild(dayCell);
+            }
+        }
+
+        function actualizarCalendario() {
+            const selectedYear = parseInt(yearSelect.value);
+            const selectedMonth = parseInt(document.getElementById('month-select').value);
+            generarCalendario(selectedMonth, selectedYear);
+        }
+
+        function mostrarHorarios(dia, mes, año) {
+            const panel = document.getElementById("schedule-panel");
+            const titulo = document.getElementById("selected-day");
+            titulo.textContent = `Horarios para el día ${dia} de ${meses[mes]} ${año}`;
+            panel.style.display = "block";
+        }
+
+        // Inicializar el calendario
+        yearSelect.value = currentYear;
+        document.getElementById('month-select').value = currentMonth;
+        generarCalendario(currentMonth, currentYear);
+    </script>
+</body>
+
+</html>

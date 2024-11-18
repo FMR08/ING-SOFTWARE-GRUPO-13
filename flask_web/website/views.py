@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
 from flask_web.database import *
-
+from utils import run_valido
 views = Blueprint('views', __name__)
 
 @views.route('/')
@@ -18,22 +18,29 @@ def submit_form():
 
     nombre = data.get('nombre')
     apellidos = data.get('apellidos')
+    correo = data.get('correo')
     fecha = data.get('fecha')
     hora = data.get('hora')
     motivo = data.get('motivo')
     especialista = data.get('specialist')
     id = data.get('idCita')
-    #TODO: revisar si es un paciente existente (si no, añadirlo a la db)
-    #TODO: obtener run del paciente
-    run = 222232222
+
+    run = data.get('rut')
+    run = run.replace(".", "").replace("-", "")
+    if not run_valido(run):
+        return jsonify({"message": "run invalido", "idCita": id, "status":"error"})
+    #revisar si paciente existe en la db
+    if buscar_paciente(run) is None:
+        insertar_paciente(run,nombre,apellidos,correo,"555555555")
     #TODO: obtener run del especialista
     run_especialista = 333333333
     #TODO: asegurarse que la id no este repetida en la db, si no, re-generarla
+
     insertar_cita(id,run_especialista,run,hora,fecha,motivo)
 
 
     # Respond back to the frontend
-    return jsonify({"message": "Cita registrada con éxito!", "idCita": id})
+    return jsonify({"message": "Cita registrada con éxito!", "idCita": id, "status":"ok"})
 
 
 @views.route('/specialist')

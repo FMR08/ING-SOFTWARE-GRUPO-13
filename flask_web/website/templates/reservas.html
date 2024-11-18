@@ -215,9 +215,12 @@
             return response.json(); // Parse JSON response if needed
         })
         .then(data => {
-            alert('Cita registrada con éxito!');
+            alert(data.message)
+            if(data.status === "error"){
+                return;
+            }
             document.getElementById("idCita").style.display = 'block';
-            document.getElementById("citaId").innerText = idCita;
+            //document.getElementById("citaId").innerText = idCita;
             //usar la id que retorna el backend, en caso de que se haya tenido que cambiar para evitar duplicacion
             if(data.idCita){
                 document.getElementById("citaId").innerText = data.idCita;

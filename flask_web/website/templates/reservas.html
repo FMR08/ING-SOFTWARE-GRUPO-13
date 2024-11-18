@@ -185,20 +185,53 @@
     }
 
     function generarIdCita(event) {
+        event.preventDefault();
         const specialist = localStorage.getItem('selectedSpecialist');
         if (!specialist || specialist === 'Especialista no seleccionado') {
             alert('Por favor, seleccione un especialista antes de reservar la cita.');
-            event.preventDefault();
             return;
         }
         
-        event.preventDefault();
+
+        const formData = JSON.parse(localStorage.getItem('formData') || '{}');
+        formData.specialist = specialist;
+
+
         const idCita = Math.random().toString(36).substring(2, 10).toUpperCase();
-        document.getElementById("idCita").style.display = 'block';
-        document.getElementById("citaId").innerText = idCita;
+        formData.idCita = idCita;
+
+        // Send data to Flask backend
+        fetch('/subirReserva', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to send data to the server');
+            }
+            return response.json(); // Parse JSON response if needed
+        })
+        .then(data => {
+            alert('Cita registrada con éxito!');
+            document.getElementById("idCita").style.display = 'block';
+            document.getElementById("citaId").innerText = idCita;
+            //usar la id que retorna el backend, en caso de que se haya tenido que cambiar para evitar duplicacion
+            if(data.idCita){
+                document.getElementById("citaId").innerText = data.idCita;
+            }
+
+            // Clean up localStorage
+            localStorage.removeItem('formData');
+            localStorage.removeItem('selectedSpecialist');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al registrar la cita.');
+        });
         document.getElementById("formulario").reset();
-        localStorage.removeItem('formData');
-        localStorage.removeItem('selectedSpecialist');
     }
 
     // Configura el mínimo para que sea el día siguiente al actual

@@ -24,10 +24,13 @@
             text-align: center;
             color: #333;
         }
-        label {
+        input {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         /* Estilos de los campos de entrada para hacerlos más cortos */
         input[type="text"], input[type="date"], input[type="time"], textarea {
@@ -121,6 +124,12 @@
         <label for="apellidos">Apellidos:</label>
         <input type="text" id="apellidos" name="apellidos" required>
 
+        <label for="rut">RUT:</label>
+        <input type="text" id="rut" name="rut" required>
+
+        <label for="correo">Correo Electrónico:</label>
+        <input type="email" id="correo" name="correo" required>
+
         <label for="fecha">Fecha de la Cita:</label>
         <input type="date" id="fecha" name="fecha" required>
 
@@ -152,6 +161,8 @@
         const formData = {
             nombre: document.getElementById('nombre').value,
             apellidos: document.getElementById('apellidos').value,
+            rut: document.getElementById('rut').value,
+            correo: document.getElementById('correo').value,
             fecha: document.getElementById('fecha').value,
             hora: document.getElementById('hora').value,
             motivo: document.getElementById('motivo').value
@@ -163,6 +174,8 @@
         const formData = JSON.parse(localStorage.getItem('formData') || '{}');
         document.getElementById('nombre').value = formData.nombre || '';
         document.getElementById('apellidos').value = formData.apellidos || '';
+        document.getElementById('rut').value = formData.rut || '';
+        document.getElementById('correo').value = formData.correo || '';
         document.getElementById('fecha').value = formData.fecha || '';
         document.getElementById('hora').value = formData.hora || '';
         document.getElementById('motivo').value = formData.motivo || '';

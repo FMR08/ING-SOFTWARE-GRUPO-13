@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify
+
 from flask_web.website.database import *
 from flask_web.website.utils import *
 views = Blueprint('views', __name__)
@@ -18,6 +19,22 @@ def obtener_citas_dia():
 
 
 
+@views.route('/obtenerEspecialistas')
+def obtener_especialistas():
+    cursor = database.cursor(dictionary=True)
+    cursor.execute("SELECT nombre,especialidad,dia,horario_inicio,horario_fin FROM medico")
+    results = cursor.fetchall()
+    especialistas = [
+        {
+            "nombre": row["nombre"],
+            "especialidad": row["especialidad"],
+            "dia": row["dia"],
+            "horario": f"{row['horario_inicio']} - {row['horario_fin']}"
+        }
+        for row in results
+    ]
+
+    return jsonify(especialistas)
 
 @views.route('/')
 def home():
@@ -57,6 +74,7 @@ def submit_form():
 
     # Respond back to the frontend
     return jsonify({"message": "Cita registrada con éxito!", "idCita": id, "status":"ok"})
+
 
 
 @views.route('/specialist')

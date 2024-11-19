@@ -51,7 +51,7 @@ def ver_tablas():
             print(row)
     cursor.close()
 
-    database.close()
+    #database.close()
 
 
 def atributos():
@@ -63,7 +63,7 @@ def atributos():
         print(row)
 
     cursor.close()
-    database.close()
+    #database.close()
 
 
 def insertar_paciente(rut,nombre,apellido,email, telefono):
@@ -79,7 +79,7 @@ def insertar_administrador(rut, nombre, correo, contraseña):
     print("Administrador "+ nombre+ " insertado")
     database.commit()
     cursor.close()
-    database.close()
+    #database.close()
 
 def insertar_medico(rut, nombre, correo, contraseña, especialidad):
     cursor = database.cursor()
@@ -87,7 +87,7 @@ def insertar_medico(rut, nombre, correo, contraseña, especialidad):
     print("Medico "+ nombre+ " insertado")
     database.commit()
     cursor.close()
-    database.close()
+    #database.close()
 
 def insertar_cita(id, medico, run_paciente, hora, fecha, motivo):
     cursor = database.cursor()
@@ -96,7 +96,7 @@ def insertar_cita(id, medico, run_paciente, hora, fecha, motivo):
     #print("Cita "+ id + " insertada")
     database.commit()
     cursor.close()
-    database.close()
+    #database.close()
 
 
 #busca al paciente por el rut y debuelbe una clase paciente con la info
@@ -125,7 +125,7 @@ def buscar_medico(rut):
     else:
         print("Medico no encontrado.")
     cursor.close()
-    database.close()
+    #database.close()
 def buscar_administrador(rut):
     cursor = database.cursor()
     cursor.execute("SELECT * FROM medico administrador rut = %s",(rut,))
@@ -136,7 +136,7 @@ def buscar_administrador(rut):
     else:
         print("Medico no encontrado.")
     cursor.close()
-    database.close()
+    #database.close()
 
 def buscar_cita(id):
     cursor = database.cursor()
@@ -148,7 +148,7 @@ def buscar_cita(id):
     else:
         print("Cita no encontrado.")
     cursor.close()
-    database.close()
+    #database.close()
 
 if __name__ == '__main__':
     ver_tablas()

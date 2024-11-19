@@ -83,6 +83,22 @@
             background-color: #5a6268;
             color: white;
         }
+
+        .cita {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .cita hr {
+            margin-top: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .cita p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 
@@ -195,9 +211,11 @@
                         data.citas.forEach(cita => {
                             citasContainer.innerHTML += `
                                 <div class="cita">
+                                    <p><strong>ID de cita:</strong> ${cita.id}</p>
                                     <p><strong>Hora:</strong> ${cita.hora}</p>
                                     <p><strong>Paciente:</strong> ${cita.paciente}</p>
                                     <p><strong>Motivo:</strong> ${cita.motivo}</p>
+                                    <hr />
                                 </div>
                             `;
                         });
@@ -213,5 +231,3 @@
 </body>
 
 </html>
-
-

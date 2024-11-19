@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
-from flask_web.website.database import *
-from flask_web.website.utils import *
+from .database import *
+from .utils import *
 views = Blueprint('views', __name__)
 @views.route('/obtenerCitasDia')
 def obtener_citas_dia():
@@ -58,6 +58,19 @@ def submit_form():
     # Respond back to the frontend
     return jsonify({"message": "Cita registrada con éxito!", "idCita": id, "status":"ok"})
 
+@views.route('/cancelarCita', methods=['POST'])
+def cancelar_cita():
+    cita_id = request.args.get('id')
+    motivo = request.args.get('motivo')
+
+    if not cita_id or not motivo:
+        return jsonify({'success': False, 'message': 'Faltan parámetros.'})
+
+    # Llamamos a la función de cancelar la cita
+    if database.cancelar_cita(cita_id, motivo):
+        return jsonify({'success': True, 'message': 'Cita cancelada correctamente.'})
+    else:
+        return jsonify({'success': False, 'message': 'Error al cancelar la cita.'})
 
 @views.route('/specialist')
 def especialistas():

@@ -53,6 +53,20 @@ def ver_tablas():
 
     #database.close()
 
+# Función para eliminar la cita y registrar el motivo de la cancelación
+def cancelar_cita(id, motivo):
+    cursor = database.cursor()
+    
+    # Insertar motivo de cancelación en una tabla de "cancelaciones" (suponiendo que ya existe)
+    cursor.execute("INSERT INTO cancelaciones (cita_id, motivo) VALUES (%s, %s)", (id, motivo))
+    
+    # Eliminar la cita de la tabla de "citas"
+    cursor.execute("DELETE FROM citas WHERE id = %s", (id,))
+    
+    database.commit()
+    cursor.close()
+    return True
+
 
 def atributos():
     cursor = database.cursor()

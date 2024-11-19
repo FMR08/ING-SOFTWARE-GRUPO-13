@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -99,6 +98,10 @@
         .cita p {
             margin: 5px 0;
         }
+
+        .cancel-cita-btn {
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -146,6 +149,26 @@
             <h5 id="selected-day"></h5>
             <div id="citas-container">
                 <p>Selecciona un día para ver las citas agendadas.</p>
+            </div>
+        </div>
+
+        <!-- Modal para cancelar la cita -->
+        <div class="modal" tabindex="-1" id="cancelCitaModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cancelar Cita</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="motivo">Motivo de la cancelación (máximo 200 palabras):</label>
+                        <textarea id="motivo-cancelacion" class="form-control" rows="5" maxlength="1000"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-danger" id="confirmar-cancelacion-btn">Confirmar Cancelación</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -215,6 +238,7 @@
                                     <p><strong>Hora:</strong> ${cita.hora}</p>
                                     <p><strong>Paciente:</strong> ${cita.paciente}</p>
                                     <p><strong>Motivo:</strong> ${cita.motivo}</p>
+                                    <button class="btn btn-danger cancel-cita-btn" onclick="cancelarCita(${cita.id})">Cancelar Cita</button>
                                     <hr />
                                 </div>
                             `;
@@ -224,10 +248,42 @@
                 .catch(error => console.error('Error al cargar citas:', error));
         }
 
+        function cancelarCita(id) {
+            // Mostrar el modal de cancelación
+            const modal = new bootstrap.Modal(document.getElementById('cancelCitaModal'));
+            modal.show();
+
+            // Configurar el botón de confirmación para cancelar la cita
+            const confirmarCancelacionBtn = document.getElementById('confirmar-cancelacion-btn');
+            confirmarCancelacionBtn.onclick = function() {
+                const motivo = document.getElementById('motivo-cancelacion').value;
+                if (motivo.length > 200) {
+                    alert('El motivo no puede tener más de 200 palabras.');
+                    return;
+                }
+
+                if (confirm('¿Está seguro de que desea cancelar esta cita?')) {
+                    // Realizar la cancelación llamando al backend
+                    fetch(`/cancelarCita?id=${id}&motivo=${encodeURIComponent(motivo)}`, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('La cita ha sido cancelada exitosamente.');
+                            location.reload(); // Recargar la página para actualizar las citas
+                        } else {
+                            alert('Error al cancelar la cita.');
+                        }
+                    })
+                    .catch(error => console.error('Error al cancelar la cita:', error));
+                }
+            }
+        }
+
         yearSelect.value = currentYear;
         document.getElementById('month-select').value = currentMonth;
         generarCalendario(currentMonth, currentYear);
     </script>
 </body>
-
 </html>

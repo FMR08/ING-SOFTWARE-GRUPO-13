@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
-from flask_web.database import *
-from utils import run_valido
+from .database import *
+from .utils import *
 views = Blueprint('views', __name__)
 
 @views.route('/')

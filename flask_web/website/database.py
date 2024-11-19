@@ -113,8 +113,8 @@ def insertar_cita(id, run_medico, run_paciente, hora, fecha, motivo):
     #database.close()
 
 
-#busca al paciente por el rut y debuelbe una clase paciente con la info
-#ejeplo de uso para sacar el nombre:
+#busca al paciente por el rut y devuelve una clase paciente con la info
+#ejemplo de uso para sacar el nombre:
 #paciente=buscar_paciente("rut")
 #print(paciente.nombre)
 def buscar_paciente(rut):

@@ -34,27 +34,7 @@
                 </tr>
             </thead>
             <tbody id="scheduleTable">
-                <tr>
-                    <td>Dr. Juan Pérez</td>
-                    <td>Cardiología</td>
-                    <td>Lunes</td>
-                    <td>10:00 AM - 11:00 AM</td>
-                    <td><button onclick="selectSpecialist('Dr. Juan Pérez - Cardiología')" class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
-                </tr>
-                <tr>
-                    <td>Dra. Ana López</td>
-                    <td>Pediatría</td>
-                    <td>Martes</td>
-                    <td>11:30 AM - 12:30 PM</td>
-                    <td><button onclick="selectSpecialist('Dra. Ana López - Pediatría')" class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
-                </tr>
-                <tr>
-                    <td>Dr. Carlos García</td>
-                    <td>Dermatología</td>
-                    <td>Miércoles</td>
-                    <td>9:00 AM - 10:00 AM</td>
-                    <td><button onclick="selectSpecialist('Dr. Carlos García - Dermatología')" class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
-                </tr>
+                <!-- Rows will be populated dynamically -->
             </tbody>
         </table>
 
@@ -62,10 +42,45 @@
     </div>
 
     <script>
+        // Function to fetch data from /obtenerEspecialistas
+        async function loadSpecialists() {
+            try {
+                // Fetch data from the endpoint
+                const response = await fetch('/obtenerEspecialistas');
+                if (!response.ok) throw new Error('Error fetching data');
+
+                const data = await response.json(); // Assuming the API returns JSON
+
+                // Populate the table
+                const tableBody = document.getElementById('scheduleTable');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                data.forEach(specialist => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${specialist.nombre}</td>
+                        <td>${specialist.especialidad}</td>
+                        <td>${specialist.dia}</td>
+                        <td>${specialist.horario}</td>
+                        <td><button onclick="selectSpecialist('${specialist.nombre} - ${specialist.especialidad}')" class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading specialists:', error);
+            }
+        }
+
+        // Function to save the selected specialist in localStorage
         function selectSpecialist(specialistName) {
             localStorage.setItem('selectedSpecialist', specialistName);
             window.location.href = "{{ url_for('views.reservas') }}";
         }
+
+        // Load specialists when the page loads
+        document.addEventListener('DOMContentLoaded', loadSpecialists);
     </script>
 </body>
 </html>

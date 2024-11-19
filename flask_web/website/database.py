@@ -103,9 +103,9 @@ def insertar_medico(rut, nombre, correo, contraseña, especialidad):
     cursor.close()
     #database.close()
 
-def insertar_cita(id, medico, run_paciente, hora, fecha, motivo):
+def insertar_cita(id, run_medico, run_paciente, hora, fecha, motivo):
     cursor = database.cursor()
-    cursor.execute("INSERT INTO citas (id, medico, paciente_rut, hora, fecha, motivo) VALUES (%s, %s, %s, %s, %s, %s)",(id, medico, run_paciente, hora, fecha, motivo))
+    cursor.execute("INSERT INTO citas (id, medico, paciente_rut, hora, fecha, motivo) VALUES (%s, %s, %s, %s, %s, %s)", (id, run_medico, run_paciente, hora, fecha, motivo))
     database.commit()
     #print("Cita "+ id + " insertada")
     database.commit()

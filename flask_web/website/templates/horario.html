@@ -83,21 +83,6 @@
             background-color: #5a6268;
             color: white;
         }
-
-        .schedule-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .schedule-inputs select,
-        .schedule-inputs input {
-            margin-top: 5px;
-        }
-
-        .schedule-inputs p {
-            margin-top: 5px;
-        }
     </style>
 </head>
 
@@ -143,46 +128,19 @@
 
         <div class="schedule-panel" id="schedule-panel">
             <h5 id="selected-day"></h5>
-            <div id="schedule-inputs" class="schedule-inputs">
-                <label for="hour-select">Selecciona una hora:</label>
-                <select id="hour-select" onchange="mostrarMensajeHora()">
-                    <option value="">Seleccionar hora</option>
-                    <option value="8">8:00 AM</option>
-                    <option value="9">9:00 AM</option>
-                    <option value="10">10:00 AM</option>
-                    <option value="11">11:00 AM</option>
-                    <option value="12">12:00 PM</option>
-                    <option value="13">1:00 PM</option>
-                    <option value="14">2:00 PM</option>
-                    <option value="15">3:00 PM</option>
-                    <option value="16">4:00 PM</option>
-                    <option value="17">5:00 PM</option>
-                    <option value="18">6:00 PM</option>
-                    <option value="19">7:00 PM</option>
-                    <option value="20">8:00 PM</option>
-                    <option value="21">9:00 PM</option>
-                    <option value="22">10:00 PM</option>
-                </select>
-
-                <div id="message-container" style="display: none;">
-                    <label for="message-input">¿Qué vas a hacer a esta hora?</label>
-                    <input type="text" id="message-input" class="form-control">
-                    <button id="save-message" class="btn btn-primary mt-3" onclick="guardarMensaje()">Guardar</button>
-                </div>
+            <div id="citas-container">
+                <p>Selecciona un día para ver las citas agendadas.</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Variables globales
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         const maxYear = 2030;
         const minYear = 2023;
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        const horariosPorDia = {}; // Almacena los horarios por día (año, mes, día)
 
-        // Generar opciones para el selector de años
         const yearSelect = document.getElementById('year-select');
         for (let year = minYear; year <= maxYear; year++) {
             const option = document.createElement('option');
@@ -191,7 +149,6 @@
             yearSelect.appendChild(option);
         }
 
-        // Generar calendario
         function generarCalendario(mes, año) {
             const calendarDays = document.getElementById("calendar-days");
             calendarDays.innerHTML = '';
@@ -209,75 +166,49 @@
                 const dayCell = document.createElement("div");
                 dayCell.classList.add("day-cell");
                 dayCell.textContent = dia;
-                dayCell.onclick = () => mostrarHorarios(dia, mes, año);
+                dayCell.onclick = () => mostrarCitas(dia, mes, año);
                 calendarDays.appendChild(dayCell);
             }
         }
 
-        // Función para actualizar el calendario
         function actualizarCalendario() {
             const selectedYear = parseInt(yearSelect.value);
             const selectedMonth = parseInt(document.getElementById('month-select').value);
             generarCalendario(selectedMonth, selectedYear);
         }
 
-        // Función para mostrar horarios
-        function mostrarHorarios(dia, mes, año) {
+        function mostrarCitas(dia, mes, año) {
             const panel = document.getElementById("schedule-panel");
             const titulo = document.getElementById("selected-day");
-            const messageContainer = document.getElementById("message-container");
-
-            titulo.textContent = `Horarios para el día ${dia} de ${meses[mes]} ${año}`;
+            titulo.textContent = `Citas para el día ${dia} de ${meses[mes]} ${año}`;
             panel.style.display = "block";
 
-            // Recuperar la información almacenada
-            if (!horariosPorDia[año]) horariosPorDia[año] = {};
-            if (!horariosPorDia[año][mes]) horariosPorDia[año][mes] = {};
-            if (!horariosPorDia[año][mes][dia]) horariosPorDia[año][mes][dia] = {};
+            fetch(`/obtenerCitasDia?fecha=${año}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`)
+                .then(response => response.json())
+                .then(data => {
+                    const citasContainer = document.getElementById('citas-container');
+                    citasContainer.innerHTML = '';
 
-            document.getElementById("hour-select").value = ""; // Resetear selección de hora
-            messageContainer.style.display = "none"; // Ocultar mensaje
-
-            // Guardar los datos de los horarios seleccionados
-            document.getElementById("hour-select").onchange = function () {
-                mostrarMensajeHora(dia, mes, año);
-            };
+                    if (data.citas.length === 0) {
+                        citasContainer.innerHTML = '<p>No hay citas para este día.</p>';
+                    } else {
+                        data.citas.forEach(cita => {
+                            citasContainer.innerHTML += `
+                                <div class="cita">
+                                    <p><strong>Hora:</strong> ${cita.hora}</p>
+                                    <p><strong>Paciente:</strong> ${cita.paciente}</p>
+                                    <p><strong>Motivo:</strong> ${cita.motivo}</p>
+                                </div>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => console.error('Error al cargar citas:', error));
         }
 
-        // Mostrar mensaje de la hora seleccionada
-        function mostrarMensajeHora(dia, mes, año) {
-            const selectedHour = parseInt(document.getElementById("hour-select").value);
-            const messageInput = document.getElementById("message-input");
-            const messageContainer = document.getElementById("message-container");
-
-            if (selectedHour) {
-                messageContainer.style.display = "block";
-
-                const storedMessage = horariosPorDia[año][mes][dia][selectedHour];
-                messageInput.value = storedMessage || ""; // Mostrar mensaje si existe, o campo vacío
-
-                document.getElementById("save-message").onclick = function () {
-                    guardarMensaje(dia, mes, año, selectedHour, messageInput.value);
-                };
-            }
-        }
-
-        // Función para guardar el mensaje
-        function guardarMensaje(dia, mes, año, hora, mensaje) {
-            if (!horariosPorDia[año]) horariosPorDia[año] = {};
-            if (!horariosPorDia[año][mes]) horariosPorDia[año][mes] = {};
-            if (!horariosPorDia[año][mes][dia]) horariosPorDia[año][mes][dia] = {};
-
-            horariosPorDia[año][mes][dia][hora] = mensaje;
-
-            alert("Horario guardado!");
-        }
-
-        // Inicialización
         yearSelect.value = currentYear;
         document.getElementById('month-select').value = currentMonth;
         generarCalendario(currentMonth, currentYear);
-
     </script>
 </body>
 

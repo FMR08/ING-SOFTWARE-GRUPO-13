@@ -2,6 +2,22 @@ from flask import Blueprint, render_template, request, jsonify
 from flask_web.database import *
 from utils import run_valido
 views = Blueprint('views', __name__)
+@views.route('/obtenerCitasDia')
+def obtener_citas_dia():
+    fecha = request.args.get('fecha')
+    cursor = database.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM citas WHERE fecha = %s", (fecha,))
+    citas = cursor.fetchall()
+    cursor.close()
+
+    # Modificar nombres de columnas según la estructura de la tabla
+    for cita in citas:
+        cita['paciente'] = buscar_paciente(cita['paciente_rut']).nombre
+
+    return jsonify({"citas": citas})
+
+
+
 
 @views.route('/')
 def home():

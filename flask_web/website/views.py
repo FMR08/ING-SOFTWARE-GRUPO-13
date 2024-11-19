@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
-from .database import *
-from .utils import *
+from flask_web.website.database import *
+from flask_web.website.utils import *
 views = Blueprint('views', __name__)
 @views.route('/obtenerCitasDia')
 def obtener_citas_dia():

@@ -11,16 +11,22 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #040505;
-    color: #000000;
+    background-color: #000000;
+    color: #050505;
+    background-image: url('../imagenes/Fondo formulario.jpg');/* Ruta de tu imagen */
+    background-size: cover;  /* La imagen cubre toda la pantalla */
+    background-position: center;  /* Centra la imagen */
+    background-attachment: fixed;  /* Hace que la imagen no se mueva cuando se hace scroll */
+    /*filter: brightness(0.5);  /* Aplica un filtro para oscurecer la imagen */
 }
+
 
 /* Contenedor general */
 .container {
     background-color: #000000;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 20px rgb(0, 0, 0);
     max-width: 600px;
     width: 100%;
     margin: 20px;
@@ -31,7 +37,7 @@ body {
     background-color: #0b8b61;
     padding: 25px;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(26, 179, 153, 0.1);
+    box-shadow: 0 4px 12px rgb(43, 38, 38);
 }
 
 .form-container h2 {
@@ -84,7 +90,6 @@ body {
     margin-bottom: 10px;
     display: none;
 }
-
 /* Estilos del calendario */
 .calendar-container {
     text-align: center;
@@ -100,7 +105,7 @@ body {
 .calendar-header select {
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid #9372c7;
+    border: 1px solid #9a55f5;
     font-size: 14px;
 }
 
@@ -115,8 +120,8 @@ body {
     font-weight: bold;
     text-transform: uppercase;
     padding: 10px;
-    background-color: #8e6fe4;
-    color: #0c0606;
+    background-color: #9570eb;
+    color: #070707;
     border-radius: 8px;
 }
 
@@ -124,7 +129,7 @@ body {
     cursor: pointer;
     padding: 20px 10px;
     border-radius: 8px;
-    background-color: #000000;
+    background-color: #b668e4;
     transition: background-color 0.3s, color 0.3s;
     display: flex;
     align-items: center;
@@ -132,6 +137,32 @@ body {
 }
 
 .day-cell:hover {
-    background-color: #12ff90;
-    color: #3c198d;
+    background-color: #7a5ad1;
+    color: #000000;
+}
+
+/* Panel de horarios */
+.schedule-panel {
+    margin-top: 20px;
+    background-color: #b186e9;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-panel h5 {
+    margin-bottom: 15px;
+    color: #000000;
+}
+
+.schedule-panel ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.schedule-panel ul li {
+    background-color: #9957ee;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
 }

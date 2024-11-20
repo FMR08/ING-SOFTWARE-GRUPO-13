@@ -146,7 +146,7 @@
         <div class="button-container">
             <button type="button" onclick="saveFormData(); location.href='{{ url_for('views.especialistas') }}'" class="view-specialists-btn">
                 Ver Especialistas
-            </button>
+            </button>            
             <button type="submit" class="reserve-btn">Reservar Cita</button>
         </div>
     </form>
@@ -182,20 +182,21 @@
         document.getElementById('motivo').value = formData.motivo || '';
 
         const selectedSpecialist = localStorage.getItem('selectedSpecialist') || 'Especialista no seleccionado';
-        document.getElementById('selected-specialist').textContent = selectedSpecialist;
+        document.getElementById('selected-specialist').textContent = selectedName;
     }
 
     function generarIdCita(event) {
         event.preventDefault();
-        const specialist = localStorage.getItem('selectedSpecialist');
-        if (!specialist || specialist === 'Especialista no seleccionado') {
+        const selectedName = localStorage.getItem('selectedSpecialistName');
+        const selectedRUT = localStorage.getItem('selectedSpecialistRUT');
+        if (!selectedName || selectedName === 'Especialista no seleccionado') {
             alert('Por favor, seleccione un especialista antes de reservar la cita.');
             return;
         }
         
 
         const formData = JSON.parse(localStorage.getItem('formData') || '{}');
-        formData.specialist = specialist;
+        formData.specialist = selectedRUT;
 
 
         const idCita = Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -238,6 +239,17 @@
         });
         document.getElementById("formulario").reset();
     }
+    const selectedName = localStorage.getItem('selectedSpecialistName');
+    const selectedRUT = localStorage.getItem('selectedSpecialistRUT');
+
+    if (selectedName && selectedRUT) {
+        console.log("Especialista seleccionado:");
+        console.log("Nombre:", selectedName);
+        console.log("RUT:", selectedRUT);
+        // Usa estos valores para mostrar información o procesar la lógica
+    } else {
+        console.error("No se encontró información del especialista seleccionado.");
+    }
 
     // Configura el mínimo para que sea el día siguiente al actual
     const fechaInput = document.getElementById('fecha');
@@ -249,6 +261,7 @@
     const month = String(hoy.getMonth() + 1).padStart(2, '0');
     const day = String(hoy.getDate()).padStart(2, '0');
     fechaInput.min = `${year}-${month}-${day}`;
+
 </script>
 
 </body>

@@ -1,19 +1,19 @@
 from flask import Blueprint, render_template, request, jsonify
-from flask_web.website.database import *
-from flask_web.website.utils import *
+from flask_web.website import database as db
+from flask_web.website import utils
 
 views = Blueprint('views', __name__)
 @views.route('/obtenerCitasDia')
 def obtener_citas_dia():
     fecha = request.args.get('fecha')
-    cursor = database.cursor(dictionary=True)
+    cursor = db.database.cursor(dictionary=True)
     cursor.execute("SELECT * FROM citas WHERE fecha = %s", (fecha,))
     citas = cursor.fetchall()
     cursor.close()
 
     # Modificar nombres de columnas según la estructura de la tabla
     for cita in citas:
-        cita['paciente'] = buscar_paciente(cita['paciente_rut']).nombre
+        cita['paciente'] = db.buscar_paciente(cita['paciente_rut']).nombre
 
     return jsonify({"citas": citas})
 
@@ -21,7 +21,7 @@ def obtener_citas_dia():
 
 @views.route('/obtenerEspecialistas')
 def obtener_especialistas():
-    cursor = database.cursor(dictionary=True)
+    cursor = db.database.cursor(dictionary=True)
     cursor.execute("SELECT rut,nombre,especialidad,dia,horario_inicio,horario_fin FROM medico")
     results = cursor.fetchall()
     especialistas = [
@@ -62,16 +62,16 @@ def submit_form():
 
     run = data.get('rut')
     run = run.replace(".", "").replace("-", "")
-    if not run_valido(run):
+    if not utils.run_valido(run):
         return jsonify({"message": "run invalido", "idCita": id, "status":"error"})
     #revisar si paciente existe en la db
-    if buscar_paciente(run) is None:
-        insertar_paciente(run,nombre,apellidos,correo,"555555555")
+    if db.buscar_paciente(run) is None:
+        db.insertar_paciente(run,nombre,apellidos,correo,"555555555")
     #TODO: obtener run del especialista
     run_especialista = 333333333
     #TODO: asegurarse que la id no este repetida en la db, si no, re-generarla
 
-    insertar_cita(id,especialista,run,hora,fecha,motivo)
+    db.insertar_cita(id,especialista,run,hora,fecha,motivo)
 
 
     # Respond back to the frontend
@@ -86,7 +86,7 @@ def cancelar_cita():
         return jsonify({'success': False, 'message': 'Faltan parámetros.'})
 
     # Llamamos a la función de cancelar la cita
-    if database.cancelar_cita(cita_id, motivo):
+    if db.cancelar_cita(cita_id, motivo):
         return jsonify({'success': True, 'message': 'Cita cancelada correctamente.'})
     else:
         return jsonify({'success': False, 'message': 'Error al cancelar la cita.'})

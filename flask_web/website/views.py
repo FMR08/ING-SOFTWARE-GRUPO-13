@@ -22,14 +22,16 @@ def obtener_citas_dia():
 @views.route('/obtenerEspecialistas')
 def obtener_especialistas():
     cursor = database.cursor(dictionary=True)
-    cursor.execute("SELECT nombre,especialidad,dia,horario_inicio,horario_fin FROM medico")
+    cursor.execute("SELECT rut,nombre,especialidad,dia,horario_inicio,horario_fin FROM medico")
     results = cursor.fetchall()
     especialistas = [
         {
+            "rut": row["rut"],
             "nombre": row["nombre"],
             "especialidad": row["especialidad"],
             "dia": row["dia"],
             "horario": f"{row['horario_inicio']} - {row['horario_fin']}"
+
         }
         for row in results
     ]
@@ -69,7 +71,7 @@ def submit_form():
     run_especialista = 333333333
     #TODO: asegurarse que la id no este repetida en la db, si no, re-generarla
 
-    insertar_cita(id,run_especialista,run,hora,fecha,motivo)
+    insertar_cita(id,especialista,run,hora,fecha,motivo)
 
 
     # Respond back to the frontend

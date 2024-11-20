@@ -30,6 +30,7 @@
                     <th>Especialidad</th>
                     <th>Día</th>
                     <th>Horario Disponible</th>
+                    <th>rut</th>
                     <th>Seleccionar</th>
                 </tr>
             </thead>
@@ -63,7 +64,14 @@
                         <td>${specialist.especialidad}</td>
                         <td>${specialist.dia}</td>
                         <td>${specialist.horario}</td>
-                        <td><button onclick="selectSpecialist('${specialist.nombre} - ${specialist.especialidad}')" class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
+                        <td>${specialist.rut}</td>
+                        <td>
+                            <button 
+                                onclick="selectSpecialist('${specialist.nombre+' '+specialist.especialidad}', '${specialist.rut}')" 
+                                class="btn btn-primary btn-sm select-btn">
+                                Seleccionar
+                            </button>
+                        </td>
                     `;
 
                     tableBody.appendChild(row);
@@ -74,11 +82,16 @@
         }
 
         // Function to save the selected specialist in localStorage
-        function selectSpecialist(specialistName) {
-            localStorage.setItem('selectedSpecialist', specialistName);
+        function selectSpecialist(specialistName, specialistRUT) {
+            // Guardar el nombre y el RUT en localStorage
+            localStorage.setItem('selectedSpecialistName', specialistName);
+            localStorage.setItem('selectedSpecialistRUT', specialistRUT);
+
+            // Redirigir a la página de reservas
             window.location.href = "{{ url_for('views.reservas') }}";
         }
 
+        
         // Load specialists when the page loads
         document.addEventListener('DOMContentLoaded', loadSpecialists);
     </script>

@@ -1,80 +1,67 @@
-// Variables globales
-const infoPanel = document.getElementById("info-panel");
-const infoText = document.getElementById("info-text");
-let selectedDay = null;
-let calendarData = {};
+document.addEventListener("DOMContentLoaded", () => {
+    const yearSelector = document.getElementById("year-selector");
+    const monthSelector = document.getElementById("month-selector");
+    const calendarGrid = document.querySelector(".calendar-grid");
 
-// Inicializar el calendario
-function initCalendar() {
-    const currentYear = new Date().getFullYear();
-    const yearSelect = document.getElementById("year-select");
-    const monthSelect = document.getElementById("month-select");
+    const generateCalendar = (year, month) => {
+        // Limpia el calendario anterior
+        const days = calendarGrid.querySelectorAll(".day-cell");
+        days.forEach(day => day.remove());
 
-    // Rellenar años
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Ajuste del índice del día (empieza en lunes)
+        const adjustedFirstDay = (firstDay === 0 ? 6 : firstDay - 1);
+
+        // Agrega celdas vacías para días previos al inicio del mes
+        for (let i = 0; i < adjustedFirstDay; i++) {
+            const emptyCell = document.createElement("div");
+            emptyCell.classList.add("day-cell", "empty-cell");
+            calendarGrid.appendChild(emptyCell);
+        }
+
+        // Agrega días del mes
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayCell = document.createElement("div");
+            dayCell.classList.add("day-cell");
+            dayCell.textContent = day;
+            calendarGrid.appendChild(dayCell);
+        }
+    };
+
+    // Población de selectores
     for (let year = 2023; year <= 2030; year++) {
         const option = document.createElement("option");
         option.value = year;
         option.textContent = year;
-        yearSelect.appendChild(option);
+        yearSelector.appendChild(option);
     }
 
-    // Rellenar meses
-    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-    months.forEach((month, index) => {
+    for (let month = 0; month < 12; month++) {
         const option = document.createElement("option");
-        option.value = index;
-        option.textContent = month;
-        monthSelect.appendChild(option);
+        option.value = month;
+        option.textContent = new Date(0, month).toLocaleString("es", { month: "long" });
+        monthSelector.appendChild(option);
+    }
+
+    // Eventos para cambiar mes/año
+    yearSelector.addEventListener("change", () => {
+        generateCalendar(parseInt(yearSelector.value), parseInt(monthSelector.value));
     });
 
-    yearSelect.value = currentYear;
-    monthSelect.value = new Date().getMonth();
-    renderCalendar(currentYear, monthSelect.value);
+    monthSelector.addEventListener("change", () => {
+        generateCalendar(parseInt(yearSelector.value), parseInt(monthSelector.value));
+    });
+
+    // Inicializa con el mes actual
+    const currentDate = new Date();
+    yearSelector.value = currentDate.getFullYear();
+    monthSelector.value = currentDate.getMonth();
+    generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+});
+
+// Redirección al HTML de horarios
+function redirectToSchedule() {
+    window.location.href = "horarios.html";
 }
-
-// Renderizar el calendario
-function renderCalendar(year, month) {
-    const calendar = document.getElementById("calendar");
-    calendar.innerHTML = "";
-
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    for (let i = 0; i < firstDay; i++) {
-        calendar.appendChild(document.createElement("div"));
-    }
-
-    for (let day = 1; day <= daysInMonth; day++) {
-        const cell = document.createElement("div");
-        cell.className = "day-cell";
-        cell.textContent = day;
-        cell.onclick = () => openInfoPanel(day, month, year);
-        calendar.appendChild(cell);
-    }
-}
-
-// Abrir el panel de información
-function openInfoPanel(day, month, year) {
-    selectedDay = `${year}-${month + 1}-${day}`;
-    infoText.value = calendarData[selectedDay] || "";
-    infoPanel.style.display = "block";
-}
-
-// Guardar información
-function guardarInfo() {
-    if (selectedDay) {
-        calendarData[selectedDay] = infoText.value;
-        alert("Información guardada para el día " + selectedDay);
-    }
-}
-
-document.getElementById("year-select").onchange = (e) => {
-    renderCalendar(e.target.value, document.getElementById("month-select").value);
-};
-
-document.getElementById("month-select").onchange = (e) => {
-    renderCalendar(document.getElementById("year-select").value, e.target.value);
-};
-
-// Inicializar la aplicación
-initCalendar();

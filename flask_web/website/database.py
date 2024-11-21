@@ -1,5 +1,9 @@
 import mysql.connector
+import smtplib
 from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import re
 
 database = mysql.connector.connect(
     host='sql10.freemysqlhosting.net',
@@ -8,19 +12,23 @@ database = mysql.connector.connect(
     database='sql10744621'
 )
 class Paciente:
-    def __init__(self, rut, nombre, email, telefono):
+    def __init__(self, rut, nombre,apellido, email, telefono):
         self.rut = rut
         self.nombre = nombre
+        self.apellido = apellido
         self.email = email
         self.telefono = telefono
 
 class Medico:
-    def __init__(self, rut, nombre, correo, contraseña, especialidad):
+    def __init__(self, rut, nombre, correo, contraseña, especialidad,dia,Hora_I,Hora_F):
         self.rut = rut
         self.nombre = nombre
         self.correo = correo
         self.contraseña = contraseña
         self.especialidad = especialidad
+        self.dia = dia
+        self.horario_inicio = Hora_I
+        self.horario_fin = Hora_F
 
 class Administrador:
     def __init__(self, rut, nombre, correo, contraseña):
@@ -108,9 +116,12 @@ def insertar_cita(id, run_medico, run_paciente, hora, fecha, motivo):
     cursor.execute("INSERT INTO citas (id, medico, paciente_rut, hora, fecha, motivo) VALUES (%s, %s, %s, %s, %s, %s)", (id, run_medico, run_paciente, hora, fecha, motivo))
     database.commit()
     #print("Cita "+ id + " insertada")
-    database.commit()
+    paciente =buscar_paciente(run_paciente)
+    medico = buscar_medico(run_medico)
+    mensaje(paciente.nombre,paciente.apellido,paciente.email,id,fecha,hora,motivo,medico.nombre)
     cursor.close()
     #database.close()
+
 
 
 #busca al paciente por el rut y devuelve una clase paciente con la info
@@ -122,7 +133,7 @@ def buscar_paciente(rut):
     cursor.execute("SELECT * FROM paciente WHERE run = %s",(rut,))
     rows = cursor.fetchall()
     if rows:
-        paciente = Paciente(rows[0][0], rows[0][1], rows[0][2], rows[0][3])
+        paciente = Paciente(rows[0][0], rows[0][1], rows[0][2], rows[0][3],rows[0][4])
         return paciente  
     else:
         return None
@@ -134,7 +145,7 @@ def buscar_medico(rut):
     cursor.execute("SELECT * FROM medico WHERE rut = %s",(rut,))
     rows = cursor.fetchall()
     if rows:
-        medico = Medico(rows[0][0], rows[0][1], rows[0][2], rows[0][3], rows[0][4])
+        medico = Medico(rows[0][0], rows[0][1], rows[0][2], rows[0][3], rows[0][4], rows[0][5], rows[0][6], rows[0][7])
         return medico  
     else:
         print("Medico no encontrado.")
@@ -163,6 +174,55 @@ def buscar_cita(id):
         print("Cita no encontrado.")
     cursor.close()
     #database.close()
+def validar_email(email):
+    """
+    Valida que el email tenga un formato correcto.
+    """
+    patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(patron, email) is not None
+
+def mensaje(nombre,apellido, destinatario, cita_id, fecha, hora, motivo, medico):
+    remitente = 'correoaaa999@gmail.com'
+    password = 'gwjy txfu mozm lnmk'  # Sustituir con una contraseña segura
+
+    # Validar destinatario
+    if not validar_email(destinatario):
+        raise ValueError(f"Correo electrónico inválido: {destinatario}")
+
+    # Crear asunto y cuerpo del mensaje
+    Asunto = 'Confirmación de Reserva'
+    body = (
+        f"Hola, señor/señora {nombre} {apellido},\n\n"
+        f"Este mensaje confirma la cita médica con la ID: {cita_id} con el médico {medico}.\n"
+        f"Fecha: {fecha}\n"
+        f"Hora: {hora}\n"
+        f"Motivo de la visita: {motivo}\n\n"
+        f"Saludos cordiales."
+    )
+
+    try:
+        # Crear el mensaje MIME
+        mensaje = MIMEMultipart()
+        mensaje['From'] = remitente
+        mensaje['To'] = destinatario
+        mensaje['Subject'] = Asunto
+        mensaje.attach(MIMEText(body, 'plain'))
+
+        # Configurar servidor SMTP
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)  # Puerto 465 para SSL
+        server.login(remitente, password)
+
+        # Enviar el correo
+        text = mensaje.as_string()
+        server.sendmail(remitente, destinatario, text)
+        print("Correo enviado correctamente.")
+    except smtplib.SMTPException as e:
+        print(f"Error al enviar el correo: {e}")
+    finally:
+        # Cerrar conexión
+        server.quit()
+
+
 
 if __name__ == '__main__':
     insertar_medico('222222222','Dr. Carlos García','carlos@example.com','password123', 'Dermatología','Miércoles','9:00 AM','10:00 AM')

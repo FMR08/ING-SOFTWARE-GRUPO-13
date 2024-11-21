@@ -38,13 +38,14 @@ class Administrador:
         self.contraseña = contraseña
 
 class Citas:
-    def __init__(self, id, medico, paciente, hora, fecha, motivo):
+    def __init__(self, id, medico, paciente, hora, fecha, motivo,estado):
         self.id = id
         self.medico = medico
         self.paciente = paciente
         self.hora = hora
         self.fecha = fecha
         self.motivo = motivo
+        self.estado = estado
 
 def ver_tablas():
     cursor = database.cursor()

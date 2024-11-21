@@ -7,7 +7,7 @@ views = Blueprint('views', __name__)
 def obtener_citas_dia():
     fecha = request.args.get('fecha')
     cursor = db.database.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM citas WHERE fecha = %s", (fecha,))
+    cursor.execute("SELECT * FROM citas WHERE fecha = %s AND estado != 'cancelada'", (fecha,))
     citas = cursor.fetchall()
     cursor.close()
 

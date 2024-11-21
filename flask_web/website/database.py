@@ -1,5 +1,5 @@
 import mysql.connector
-
+from datetime import datetime
 
 database = mysql.connector.connect(
     host='sql10.freemysqlhosting.net',
@@ -56,12 +56,12 @@ def ver_tablas():
 # Función para eliminar la cita y registrar el motivo de la cancelación
 def cancelar_cita(id, motivo):
     cursor = database.cursor()
-    
+    fecha_cancelacion = datetime.now()
     # Insertar motivo de cancelación en una tabla de "cancelaciones" (suponiendo que ya existe)
-    cursor.execute("INSERT INTO cancelaciones (cita_id, motivo) VALUES (%s, %s)", (id, motivo))
+    cursor.execute("INSERT INTO cancelaciones (id_cita, motivo, fecha_cancelacion) VALUES (%s, %s, %s)", (id, motivo,fecha_cancelacion))
     
-    # Eliminar la cita de la tabla de "citas"
-    cursor.execute("DELETE FROM citas WHERE id = %s", (id,))
+    # Marcar la cita de la tabla de "citas" como cancelada
+    cursor.execute("UPDATE citas SET estado='cancelada' WHERE id = %s", (id,))
     
     database.commit()
     cursor.close()
@@ -95,9 +95,9 @@ def insertar_administrador(rut, nombre, correo, contraseña):
     cursor.close()
     #database.close()
 
-def insertar_medico(rut, nombre, correo, contraseña, especialidad):
+def insertar_medico(rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin):
     cursor = database.cursor()
-    cursor.execute("INSERT INTO medico (rut, nombre, correo, contraseña, especialidad) VALUES (%s, %s, %s, %s, %s)",(rut, nombre, correo, contraseña, especialidad))
+    cursor.execute("INSERT INTO medico (rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",(rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin))
     print("Medico "+ nombre+ " insertado")
     database.commit()
     cursor.close()
@@ -165,7 +165,7 @@ def buscar_cita(id):
     #database.close()
 
 if __name__ == '__main__':
-    ver_tablas()
+    insertar_medico('222222222','Dr. Carlos García','carlos@example.com','password123', 'Dermatología','Miércoles','9:00 AM','10:00 AM')
     
     
     

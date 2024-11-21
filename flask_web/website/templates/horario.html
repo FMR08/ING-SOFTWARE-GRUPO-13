@@ -102,6 +102,15 @@
         .cancel-cita-btn {
             margin-top: 10px;
         }
+
+        .calendar-header button {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
@@ -110,11 +119,11 @@
         <a href="{{ url_for('views.home') }}" class="btn btn-primary back-button">Volver al Inicio</a>
 
         <div class="calendar-header">
+            <button class="btn btn-outline-secondary" id="prev-month-btn">&lt;</button>
+            
             <div>
                 <label for="year-select">Año:</label>
-                <select id="year-select" onchange="actualizarCalendario()">
-                </select>
-
+                <select id="year-select" onchange="actualizarCalendario()"></select>
                 <label for="month-select">Mes:</label>
                 <select id="month-select" onchange="actualizarCalendario()">
                     <option value="0">Enero</option>
@@ -131,6 +140,8 @@
                     <option value="11">Diciembre</option>
                 </select>
             </div>
+        
+            <button class="btn btn-outline-secondary" id="next-month-btn">&gt;</button>
         </div>
 
         <div class="calendar-grid">
@@ -281,6 +292,37 @@
                 }
             }
         }
+        // Función para manejar el cambio de mes con las flechas
+        function cambiarMes(incremento) {
+            currentMonth += incremento;
+
+            // Si el mes es menor que 0, pasamos al año anterior
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+                if (currentYear < minYear) {
+                    currentYear = minYear;
+                    currentMonth = 0; // Evita que se vaya fuera del rango permitido
+                }
+            }
+
+            // Si el mes es mayor que 11, pasamos al año siguiente
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+                if (currentYear > maxYear) {
+                    currentYear = maxYear;
+                    currentMonth = 11; // Evita que se vaya fuera del rango permitido
+                }
+            }
+            yearSelect.value = currentYear;
+            document.getElementById('month-select').value = currentMonth;
+            generarCalendario(currentMonth, currentYear);
+        }
+
+        document.getElementById('prev-month-btn').onclick = () => cambiarMes(-1);
+        document.getElementById('next-month-btn').onclick = () => cambiarMes(1);
+
 
         yearSelect.value = currentYear;
         document.getElementById('month-select').value = currentMonth;

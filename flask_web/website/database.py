@@ -20,7 +20,7 @@ class Paciente:
         self.telefono = telefono
 
 class Medico:
-    def __init__(self, rut, nombre, correo, contraseña, especialidad,dia,Hora_I,Hora_F):
+    def __init__(self, rut, nombre, correo, contraseña, especialidad,dia,Hora_I,Hora_F,precio_consulta):
         self.rut = rut
         self.nombre = nombre
         self.correo = correo
@@ -29,6 +29,7 @@ class Medico:
         self.dia = dia
         self.horario_inicio = Hora_I
         self.horario_fin = Hora_F
+        self.precio_consulta = precio_consulta
 
 class Administrador:
     def __init__(self, rut, nombre, correo, contraseña):
@@ -104,9 +105,9 @@ def insertar_administrador(rut, nombre, correo, contraseña):
     cursor.close()
     #database.close()
 
-def insertar_medico(rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin):
+def insertar_medico(rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin, precio_consulta):
     cursor = database.cursor()
-    cursor.execute("INSERT INTO medico (rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",(rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin))
+    cursor.execute("INSERT INTO medico (rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin, precio_consulta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",(rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin, precio_consulta))
     print("Medico "+ nombre+ " insertado")
     database.commit()
     cursor.close()

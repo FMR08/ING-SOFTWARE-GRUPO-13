@@ -18,11 +18,11 @@ def obtener_citas_dia():
     return jsonify({"citas": citas})
 
 
-
+#Se ha añadido precio_consulta
 @views.route('/obtenerEspecialistas')
 def obtener_especialistas():
     cursor = db.database.cursor(dictionary=True)
-    cursor.execute("SELECT rut,nombre,especialidad,dia,horario_inicio,horario_fin FROM medico")
+    cursor.execute("SELECT rut,nombre,especialidad,dia,horario_inicio,horario_fin, precio_consulta FROM medico")
     results = cursor.fetchall()
     especialistas = [
         {
@@ -30,7 +30,8 @@ def obtener_especialistas():
             "nombre": row["nombre"],
             "especialidad": row["especialidad"],
             "dia": row["dia"],
-            "horario": f"{row['horario_inicio']} - {row['horario_fin']}"
+            "horario": f"{row['horario_inicio']} - {row['horario_fin']}",
+            "Precio de consulta": row["precio_consulta"]
 
         }
         for row in results

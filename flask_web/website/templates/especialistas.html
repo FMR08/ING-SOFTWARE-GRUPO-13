@@ -49,6 +49,7 @@
                     <th>Día</th>
                     <th>Horario Disponible</th>
                     <th>RUT</th>
+                    <th>Precio de Consulta</th>
                     <th>Seleccionar</th>
                 </tr>
             </thead>
@@ -115,6 +116,7 @@
                     <td>${specialist.dia}</td>
                     <td>${specialist.horario}</td>
                     <td>${specialist.rut}</td>
+                    <td>${specialist["Precio de consulta"]}</td> <!-- Mostrar precio de consulta -->
                     <td>
                         <button
                             onclick="selectSpecialist('${specialist.nombre} ${specialist.especialidad}', '${specialist.rut}')"
@@ -127,6 +129,7 @@
                 tableBody.appendChild(row);
             });
         }
+
 
         // Apply filters
         function applyFilters() {

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        input {
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #888;
+        }
+        #back-to-home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button id="back-to-home-btn" onclick="location.href='{{ url_for('views.home') }}'">Volver al Inicio</button>
+    <div class="container">
+        <h2>Registro</h2>
+        <form id="formRegistro" onsubmit="registrarUsuario(event)">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+
+            <label for="apellidos">Apellidos:</label>
+            <input type="text" id="apellidos" name="apellidos" required>
+
+            <label for="correo">Correo Electrónico:</label>
+            <input type="email" id="correo" name="correo" required>
+
+            <label for="telefono">Teléfono:</label>
+            <input type="tel" id="telefono" name="telefono" required>
+
+            <label for="contraseña">Contraseña:</label>
+            <input type="password" id="contraseña" name="contraseña" required>
+
+            <label for="rut">RUT:</label>
+            <input type="text" id="rut" name="rut" required>
+
+            <button type="submit">Registrarse</button>
+        </form>
+    </div>
+
+    <script>
+        // Función para enviar datos al servidor
+        async function registrarUsuario(event) {
+            event.preventDefault(); // Evitar recarga de página
+
+            // Obtener los datos del formulario
+            const nombre = document.getElementById('nombre').value;
+            const apellidos = document.getElementById('apellidos').value;
+            const correo = document.getElementById('correo').value;
+            const telefono = document.getElementById('telefono').value;
+            const contraseña = document.getElementById('contraseña').value;
+            const rut = document.getElementById('rut').value;
+
+            // Crear objeto con los datos
+            const data = {
+                nombre,
+                apellidos,
+                correo,
+                telefono,
+                contraseña,
+                rut
+            };
+
+            try {
+                // Enviar datos al servidor
+                const response = await fetch('/registrarUsuario', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                // Manejar la respuesta del servidor
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message); // Mostrar mensaje de éxito
+                    document.getElementById('formRegistro').reset(); // Reiniciar formulario
+                } else {
+                    alert(`Error: ${result.message}`);
+                }
+            } catch (error) {
+                console.error('Error al enviar los datos:', error);
+                alert('Ocurrió un error al registrar el usuario.');
+            }
+        }
+    </script>
+</body>
+</html>

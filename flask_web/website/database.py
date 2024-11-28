@@ -11,6 +11,15 @@ database = mysql.connector.connect(
     password='EI4pljbcyV',
     database='sql10748269'
 )
+class Usuarios:
+    def __init__(self, rut, nombre,apellido, email, telefono, contraseña):
+        self.rut = rut
+        self.nombre = nombre
+        self.apellido = apellido
+        self.email = email
+        self.telefono = telefono
+        self.contraseña = contraseña
+
 class Paciente:
     def __init__(self, rut, nombre,apellido, email, telefono):
         self.rut = rut
@@ -89,6 +98,12 @@ def atributos():
     cursor.close()
     #database.close()
 
+def insertar_usuarios(rut,nombre,apellido,email, telefono, contraseña):
+    cursor = database.cursor()
+    cursor.execute("INSERT INTO usuarios (rut, nombre, apellido, email, telefono, contraseña) VALUES (%s, %s, %s, %s, %s, %s)",(rut,nombre,apellido,email, telefono,contraseña))
+    print("Usuarios "+ nombre+ " insertado")
+    database.commit()
+    cursor.close()
 
 def insertar_paciente(rut,nombre,apellido,email, telefono):
     cursor = database.cursor()
@@ -137,6 +152,18 @@ def buscar_paciente(rut):
     if rows:
         paciente = Paciente(rows[0][0], rows[0][1], rows[0][2], rows[0][3],rows[0][4])
         return paciente  
+    else:
+        return None
+        print("Paciente no encontrado.")
+    cursor.close()
+
+def buscar_usuarios(rut):
+    cursor = database.cursor()
+    cursor.execute("SELECT * FROM usuarios WHERE rut = %s",(rut,))
+    rows = cursor.fetchall()
+    if rows:
+        usuarios = Usuarios(rows[0][0], rows[0][1], rows[0][2], rows[0][3], rows[0][4], rows[0][5])
+        return usuarios  
     else:
         return None
         print("Paciente no encontrado.")
@@ -228,7 +255,9 @@ def mensaje(nombre,apellido, destinatario, cita_id, fecha, hora, motivo, medico)
 
 if __name__ == '__main__':
 
-    insertar_medico('987654321','Juan Perez','juan.perez@email.','password123', 'Cardiologia','Lunes','09:00:00','10:00:00', '20000')
+  
+    ver_tablas()
     
+    database.close()
     
     

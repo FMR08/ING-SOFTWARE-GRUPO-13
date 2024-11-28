@@ -7,9 +7,9 @@ import re
 
 database = mysql.connector.connect(
     host='sql10.freemysqlhosting.net',
-    user='sql10744621',
-    password='3V8KsTBuW1',
-    database='sql10744621'
+    user='sql10748269',
+    password='EI4pljbcyV',
+    database='sql10748269'
 )
 class Paciente:
     def __init__(self, rut, nombre,apellido, email, telefono):
@@ -227,7 +227,8 @@ def mensaje(nombre,apellido, destinatario, cita_id, fecha, hora, motivo, medico)
 
 
 if __name__ == '__main__':
-    insertar_medico('222222222','Dr. Carlos García','carlos@example.com','password123', 'Dermatología','Miércoles','9:00 AM','10:00 AM')
+
+    insertar_medico('987654321','Juan Perez','juan.perez@email.','password123', 'Cardiologia','Lunes','09:00:00','10:00:00', '20000')
     
     
     

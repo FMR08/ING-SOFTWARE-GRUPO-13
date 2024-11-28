@@ -72,7 +72,7 @@ def submit_form():
     run_especialista = 333333333
     #TODO: asegurarse que la id no este repetida en la db, si no, re-generarla
 
-    db.insertar_cita(id,especialista,run,hora,fecha,motivo)
+    db.insertar_cita(id,especialista,run,hora,fecha,motivo,"Confirmada")
 
 
     # Respond back to the frontend

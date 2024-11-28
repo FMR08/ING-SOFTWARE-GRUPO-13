@@ -89,7 +89,7 @@ def cancelar_cita(id, motivo):
 
 def atributos():
     cursor = database.cursor()
-    cursor.execute("DESCRIBE administrador")
+    cursor.execute("DESCRIBE medico")
     rows = cursor.fetchall()
     print("Atributos de la tabla citas:")
     for row in rows: 
@@ -107,7 +107,7 @@ def insertar_usuarios(rut,nombre,apellido,email, telefono, contraseña):
 
 def insertar_paciente(rut,nombre,apellido,email, telefono):
     cursor = database.cursor()
-    cursor.execute("INSERT INTO paciente (run, nombre, apellido, correo, telefono) VALUES (%s, %s, %s, %s, %s)",(rut,nombre,apellido,email, telefono))
+    cursor.execute("INSERT INTO paciente (rut, nombre, apellido, email, telefono) VALUES (%s, %s, %s, %s, %s)",(rut,nombre,apellido,email, telefono))
     print("Paciente "+ nombre+ " insertado")
     database.commit()
     cursor.close()
@@ -122,15 +122,15 @@ def insertar_administrador(rut, nombre, correo, contraseña):
 
 def insertar_medico(rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin, precio_consulta):
     cursor = database.cursor()
-    cursor.execute("INSERT INTO medico (rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin, precio_consulta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",(rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin, precio_consulta))
+    cursor.execute("INSERT INTO medico (rut, nombre, email, contraseña, especialidad, dia, horario_inicio, horario_fin, precio_consulta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",(rut, nombre, correo, contraseña, especialidad, dia, horario_inicio, horario_fin, precio_consulta))
     print("Medico "+ nombre+ " insertado")
     database.commit()
     cursor.close()
     #database.close()
 
-def insertar_cita(id, run_medico, run_paciente, hora, fecha, motivo):
+def insertar_cita(id, run_medico, run_paciente, hora, fecha, motivo,estado):
     cursor = database.cursor()
-    cursor.execute("INSERT INTO citas (id, medico, paciente_rut, hora, fecha, motivo) VALUES (%s, %s, %s, %s, %s, %s)", (id, run_medico, run_paciente, hora, fecha, motivo))
+    cursor.execute("INSERT INTO citas (id, medico, paciente, hora, fecha, motivo, estado) VALUES (%s, %s, %s, %s, %s, %s, %s)", (id, run_medico, run_paciente, hora, fecha, motivo, estado))
     database.commit()
     #print("Cita "+ id + " insertada")
     paciente =buscar_paciente(run_paciente)
@@ -147,7 +147,7 @@ def insertar_cita(id, run_medico, run_paciente, hora, fecha, motivo):
 #print(paciente.nombre)
 def buscar_paciente(rut):
     cursor = database.cursor()
-    cursor.execute("SELECT * FROM paciente WHERE run = %s",(rut,))
+    cursor.execute("SELECT * FROM paciente WHERE rut = %s",(rut,))
     rows = cursor.fetchall()
     if rows:
         paciente = Paciente(rows[0][0], rows[0][1], rows[0][2], rows[0][3],rows[0][4])
@@ -174,7 +174,7 @@ def buscar_medico(rut):
     cursor.execute("SELECT * FROM medico WHERE rut = %s",(rut,))
     rows = cursor.fetchall()
     if rows:
-        medico = Medico(rows[0][0], rows[0][1], rows[0][2], rows[0][3], rows[0][4], rows[0][5], rows[0][6], rows[0][7])
+        medico = Medico(rows[0][0], rows[0][1], rows[0][2], rows[0][3], rows[0][4], rows[0][5], rows[0][6], rows[0][7], rows[0][8])
         return medico  
     else:
         print("Medico no encontrado.")
@@ -257,7 +257,6 @@ if __name__ == '__main__':
 
   
     ver_tablas()
-    
     database.close()
     
     

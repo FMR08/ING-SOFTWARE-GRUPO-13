@@ -111,7 +111,9 @@
     <!-- Contenedor de botones en la parte superior -->
     <div class="top-buttons">
         <button class="login-btn">Iniciar Sesión</button>
-        <button class="register-btn">Registrarse</button>
+        <a href="{{ url_for('views.registrarse') }}">
+            <button class="register-btn">Registrarse</button>
+        </a>
     </div>
 
     <!-- Título principal en el centro de la página -->

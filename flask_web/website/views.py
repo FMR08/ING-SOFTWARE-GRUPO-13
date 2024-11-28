@@ -92,6 +92,43 @@ def cancelar_cita():
     else:
         return jsonify({'success': False, 'message': 'Error al cancelar la cita.'})
 
+@views.route('/registrarUsuario', methods=['POST'])
+def registrar_usuario():
+    try:
+        # Obtener y validar los datos de la solicitud
+        data = request.get_json()
+        if not data:
+            return jsonify({"message": "Solicitud JSON inválida"}), 400
+
+        # Extraer datos
+        nombre = data.get('nombre')
+        apellidos = data.get('apellidos')
+        correo = data.get('correo')
+        telefono = data.get('telefono')
+        contraseña = data.get('contraseña')
+        rut = data.get('rut')
+        
+        if not all([nombre, apellidos, correo, telefono, contraseña, rut]):
+            return jsonify({"message": "Todos los campos son obligatorios"}), 400
+
+        # Validar RUT
+        rut = rut.replace(".", "").replace("-", "")
+        print("n: "+nombre+ " a: "+apellidos+" c: "+correo+" t: " +telefono+" c: "+
+              contraseña+" r: "+rut)
+        if db.buscar_usuarios(rut):
+            return jsonify({"message": "El usuario ya está registrado"}), 409
+        db.insertar_usuarios(rut, nombre, apellidos, correo, telefono, contraseña)
+        return jsonify({"message": "¡Usuario registrado con éxito!"}), 201
+
+    except Exception as e:
+        # Loggear el error en la consola para depuración
+        print(f"Error interno del servidor: {e}")
+        return jsonify({"message": "Ocurrió un error interno", "error": str(e)}), 500
+
+
+@views.route('/registro')
+def registrarse():
+    return render_template("registrarse.html")
 
 @views.route('/specialist')
 def especialistas():

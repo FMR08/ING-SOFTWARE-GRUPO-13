@@ -111,6 +111,13 @@
             display: none;
             -webkit-appearance: none;
         }
+        .error-message {
+            color: #cc0202;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 0px;
+            text-align: left;
+        }
     </style>
 </head>
 <body onload="restoreFormData()">
@@ -129,7 +136,8 @@
         <input type="text" id="rut" name="rut" required oninput="saveFormData();validarRut()" onblur="validarRut()">
 
         <label for="correo">Correo Electrónico:</label>
-        <input type="email" id="correo" name="correo" required oninput="saveFormData()">
+        <div id="correo-error" class="error-message"></div>
+        <input type="email" id="correo" name="correo" required oninput="saveFormData()" onblur="validarCorreo()">
 
         <label for="fecha">Fecha de la Cita:</label>
         <input type="date" id="fecha" name="fecha" required oninput="saveFormData()">
@@ -160,7 +168,7 @@
 <script>
     function validarRut() {
         const rutInput = document.getElementById('rut');
-        const rutValue = rutInput.value.replace(/[.-]/g, '');//el replace le quita los puntos y guion
+        const rutValue = rutInput.value.replace(/[.-]/g, ''); //el replace le quita los puntos y guion
 
         if (rutValue.length !== 9) {
             rutInput.setCustomValidity("Por favor inserte un rut valido");
@@ -193,6 +201,23 @@
         } else {
             rutInput.setCustomValidity("Por favor inserte un rut valido");
             rutInput.reportValidity(); // Triggers the message immediately
+        }
+    }
+
+    function validarCorreo() {
+        const correoInput = document.getElementById('correo');
+        const correoValue = correoInput.value;
+        const correoError = document.getElementById('correo-error');
+        const correoRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        // Verificar si el correo es válido
+        if (!correoRegex.test(correoValue)) {
+            correoInput.setCustomValidity("Por favor ingrese un correo válido.");
+            correoError.textContent = "El correo debe tener el formato: ejemplo@dominio.com";
+            correoInput.reportValidity();
+        } else {
+            correoInput.setCustomValidity("");  // Restablecer el mensaje de error si es válido
+            correoError.textContent = "";  // Limpiar el mensaje de error
         }
     }
 
@@ -236,11 +261,11 @@
         const formData = JSON.parse(localStorage.getItem('formData') || '{}');
         formData.specialist = selectedRUT;
 
-
+        
         const idCita = Math.random().toString(36).substring(2, 10).toUpperCase();
         formData.idCita = idCita;
 
-        // Send data to Flask backend
+        // Enviar los datos al backend (simulación)
         fetch('/subirReserva', {
             method: 'POST',
             headers: {
@@ -248,26 +273,16 @@
             },
             body: JSON.stringify(formData)
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to send data to the server');
-            }
-            return response.json(); // Parse JSON response if needed
-        })
+        .then(response => response.json())
         .then(data => {
-            alert(data.message)
-            if(data.status === "error"){
-                restoreFormData();
-                return;
-            }
-            document.getElementById("idCita").style.display = 'block';
-            //document.getElementById("citaId").innerText = idCita;
-            //usar la id que retorna el backend, en caso de que se haya tenido que cambiar para evitar duplicacion
-            if(data.idCita){
-                document.getElementById("citaId").innerText = data.idCita;
+            if (data.status === "error") {
+                alert("Hubo un error al registrar la cita.");
+            } else {
+                document.getElementById("idCita").style.display = 'block';
+                document.getElementById("citaId").innerText = idCita;
             }
 
-            // Clean up localStorage
+            // Limpiar localStorage después de la reserva
             localStorage.removeItem('formData');
             localStorage.removeItem('selectedSpecialist');
         })
@@ -275,6 +290,7 @@
             console.error('Error:', error);
             alert('Ocurrió un error al registrar la cita.');
         });
+
         document.getElementById("formulario").reset();
     }
     const selectedName = localStorage.getItem('selectedSpecialistName');
@@ -299,8 +315,8 @@
     const month = String(hoy.getMonth() + 1).padStart(2, '0');
     const day = String(hoy.getDate()).padStart(2, '0');
     fechaInput.min = `${year}-${month}-${day}`;
-
 </script>
 
 </body>
 </html>
+

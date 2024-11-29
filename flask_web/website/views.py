@@ -126,7 +126,7 @@ def registrar_usuario():
         return jsonify({"message": "Ocurrió un error interno", "error": str(e)}), 500
 
 
-@views.route('/registro')
+@views.route('/sign-up')
 def registrarse():
     return render_template("registrarse.html")
 

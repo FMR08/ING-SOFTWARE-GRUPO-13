@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Poppins', sans-serif;
+            background-color: #d1d3d8;
             margin: 0;
             padding: 0;
             display: flex;
@@ -16,11 +17,11 @@
             height: 100vh;
         }
         .container {
-            background: #ffffff;
-            padding: 20px;
+            background: #f7f9fc;
+            padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 320px;
         }
         h2 {
             text-align: center;
@@ -36,11 +37,12 @@
             color: #555;
         }
         input {
-            padding: 8px;
+            padding: 10px;
             margin-top: 5px;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
+            background-color: #fff;
         }
         button {
             margin-top: 20px;
@@ -63,15 +65,20 @@
         }
         #back-to-home-btn {
             position: absolute;
-            top: 20px;
+            top: 0px;
             left: 20px;
             background-color: #6c757d;
             color: white;
             border: none;
-            border-radius: 4px;
-            padding: 8px 16px;
-            font-size: 14px;
-            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            z-index: 10;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -82,45 +89,174 @@
         <form id="formRegistro" onsubmit="registrarUsuario(event)">
             <label for="nombre">Nombre:</label>
             <input type="text" id="nombre" name="nombre" required>
+            <div id="nombreError" class="error"></div>
 
             <label for="apellidos">Apellidos:</label>
             <input type="text" id="apellidos" name="apellidos" required>
+            <div id="apellidosError" class="error"></div>
 
             <label for="correo">Correo Electrónico:</label>
             <input type="email" id="correo" name="correo" required>
+            <div id="correoError" class="error"></div>
 
             <label for="telefono">Teléfono:</label>
             <input type="tel" id="telefono" name="telefono" required>
+            <div id="telefonoError" class="error"></div>
 
             <label for="contraseña">Contraseña:</label>
             <input type="password" id="contraseña" name="contraseña" required>
+            <div id="contraseñaError" class="error"></div>
 
             <label for="rut">RUT:</label>
             <input type="text" id="rut" name="rut" required>
+            <div id="rutError" class="error"></div>
 
             <button type="submit">Registrarse</button>
         </form>
     </div>
 
     <script>
-        // Función para enviar datos al servidor
-        async function registrarUsuario(event) {
-            event.preventDefault(); // Evitar recarga de página
+        // Función para validar el correo electrónico
+        function validarCorreo(correo) {
+            const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            return regexCorreo.test(correo);
+        }
 
-            // Obtener los datos del formulario
+        // Función para validar el RUT chileno
+        function validarRUT(rut) {
+            rut = rut.replace(/[^0-9kK]/g, '').toUpperCase();
+            const cuerpo = rut.slice(0, -1);
+            const dv = rut.slice(-1);
+            let suma = 0;
+            let multiplo = 2;
+
+            for (let i = cuerpo.length - 1; i >= 0; i--) {
+                suma += cuerpo.charAt(i) * multiplo;
+                multiplo = (multiplo === 7) ? 2 : multiplo + 1;
+            }
+
+            const dvCalculado = 11 - (suma % 11);
+            if (dvCalculado === 11) {
+                return dv === '0';
+            } else if (dvCalculado === 10) {
+                return dv === 'K';
+            } else {
+                return dv == dvCalculado;
+            }
+        }
+
+        // Función para validar el teléfono (aceptar con y sin separadores)
+        function validarTelefono(telefono) {
+            // Acepta números de teléfono con o sin espacios o guiones
+            const regexTelefono = /^(\+56\s?)?(\d{1,2}[\s\-]?)?(\d{4}[\s\-]?)?(\d{4})$/;
+            return regexTelefono.test(telefono);
+        }
+
+        // Función para validar la contraseña
+        function validarContraseña(contraseña) {
+            const regexContraseña = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+            return regexContraseña.test(contraseña);
+        }
+
+        // Función para mostrar mensaje de error
+        function mostrarError(idError, mensaje) {
+            const errorElement = document.getElementById(idError);
+            errorElement.textContent = mensaje;
+        }
+
+        // Función para borrar mensaje de error
+        function borrarError(idError) {
+            const errorElement = document.getElementById(idError);
+            errorElement.textContent = '';
+        }
+
+        // Función para manejar la validación al cambiar de campo
+        function validarCampo(event) {
+            const campo = event.target;
+            const valor = campo.value;
+            const id = campo.id;
+
+            switch (id) {
+                case 'nombre':
+                    if (!valor.trim()) {
+                        mostrarError('nombreError', 'El nombre no puede estar vacío.');
+                    } else {
+                        borrarError('nombreError');
+                    }
+                    break;
+                case 'apellidos':
+                    if (!valor.trim()) {
+                        mostrarError('apellidosError', 'Los apellidos no pueden estar vacíos.');
+                    } else {
+                        borrarError('apellidosError');
+                    }
+                    break;
+                case 'correo':
+                    if (!validarCorreo(valor)) {
+                        mostrarError('correoError', 'Correo no válido. Ejemplo de formato: usuario@dominio.com');
+                    } else {
+                        borrarError('correoError');
+                    }
+                    break;
+                case 'telefono':
+                    if (!validarTelefono(valor)) {
+                        mostrarError('telefonoError', 'Número de teléfono no válido. Ejemplo: +56 9 1234 5678');
+                    } else {
+                        borrarError('telefonoError');
+                    }
+                    break;
+                case 'contraseña':
+                    if (!validarContraseña(valor)) {
+                        mostrarError('contraseñaError', 'Contraseña no válida. Debe tener al menos 8 caracteres, incluir una letra mayúscula, una minúscula y un número.');
+                    } else {
+                        borrarError('contraseñaError');
+                    }
+                    break;
+                case 'rut':
+                    if (!validarRUT(valor)) {
+                        mostrarError('rutError', 'RUT no válido.');
+                    } else {
+                        borrarError('rutError');
+                    }
+                    break;
+            }
+        }
+
+        // Agregar validación a los campos
+        document.getElementById('nombre').addEventListener('blur', validarCampo);
+        document.getElementById('apellidos').addEventListener('blur', validarCampo);
+        document.getElementById('correo').addEventListener('blur', validarCampo);
+        document.getElementById('telefono').addEventListener('blur', validarCampo);
+        document.getElementById('contraseña').addEventListener('blur', validarCampo);
+        document.getElementById('rut').addEventListener('blur', validarCampo);
+
+        // Función para enviar datos al servidor
+        // Función para manejar el evento del formulario
+        async function registrarUsuario(event) {
+            event.preventDefault();
+
+            let telefono = document.getElementById('telefono').value;
             const nombre = document.getElementById('nombre').value;
             const apellidos = document.getElementById('apellidos').value;
             const correo = document.getElementById('correo').value;
-            const telefono = document.getElementById('telefono').value;
             const contraseña = document.getElementById('contraseña').value;
             const rut = document.getElementById('rut').value;
+
+            // Validar todos los campos antes de enviar
+            if (!nombre.trim() || !apellidos.trim() || !validarCorreo(correo) || !validarTelefono(telefono) || !validarContraseña(contraseña) || !validarRUT(rut)) {
+                alert("Por favor, completa correctamente todos los campos.");
+                return;
+            }
+
+            // Limpiar caracteres no numéricos del teléfono
+            telefono = telefono.replace(/\D/g, ''); // Eliminar cualquier carácter no numérico
 
             // Crear objeto con los datos
             const data = {
                 nombre,
                 apellidos,
                 correo,
-                telefono,
+                telefono, // Se guarda el teléfono sin espacios ni guiones
                 contraseña,
                 rut
             };
@@ -141,13 +277,14 @@
                     alert(result.message); // Mostrar mensaje de éxito
                     document.getElementById('formRegistro').reset(); // Reiniciar formulario
                 } else {
-                    alert(`Error: ${result.message}`);
+                    alert(`Error: ${result.message}`); // Mostrar mensaje de error
                 }
             } catch (error) {
                 console.error('Error al enviar los datos:', error);
                 alert('Ocurrió un error al registrar el usuario.');
             }
         }
+
     </script>
 </body>
 </html>

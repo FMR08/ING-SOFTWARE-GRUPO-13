@@ -258,5 +258,3 @@ if __name__ == '__main__':
   
     ver_tablas()
     database.close()
-    
-    

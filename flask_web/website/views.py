@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify
 from flask_web.website import database as db
 from flask_web.website import utils
+import re
 
 views = Blueprint('views', __name__)
 @views.route('/obtenerCitasDia')
@@ -46,7 +47,12 @@ def home():
 @views.route('/book')
 def reservas():
     return render_template("reservas.html")
-
+    
+def correo_valido(correo):
+    # Expresión regular para validar correos electrónicos
+    patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(patron, correo) is not None
+    
 @views.route('/subirReserva', methods=['POST'])
 def submit_form():
     data = request.get_json()  # Parse the JSON data sent by JavaScript
@@ -65,6 +71,9 @@ def submit_form():
     run = run.replace(".", "").replace("-", "")
     if not utils.run_valido(run):
         return jsonify({"message": "run invalido", "idCita": id, "status":"error"})
+    # Validar correo
+    if not correo_valido(correo):
+        return jsonify({"message": "Correo inválido", "idCita": id, "status": "error"})
     #revisar si paciente existe en la db
     if db.buscar_paciente(run) is None:
         db.insertar_paciente(run,nombre,apellidos,correo,"555555555")

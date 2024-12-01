@@ -136,7 +136,6 @@
         <input type="text" id="rut" name="rut" required oninput="saveFormData();validarRut()" onblur="validarRut()">
 
         <label for="correo">Correo Electrónico:</label>
-        <div id="correo-error" class="error-message"></div>
         <input type="email" id="correo" name="correo" required oninput="saveFormData()" onblur="validarCorreo()">
 
         <label for="fecha">Fecha de la Cita:</label>
@@ -208,17 +207,14 @@
     function validarCorreo() {
         const correoInput = document.getElementById('correo');
         const correoValue = correoInput.value;
-        const correoError = document.getElementById('correo-error');
         const correoRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
+    
         // Verificar si el correo es válido
         if (!correoRegex.test(correoValue)) {
-            correoInput.setCustomValidity("Por favor ingrese un correo válido.");
-            correoError.textContent = "El correo debe tener el formato: ejemplo@dominio.com";
-            correoInput.reportValidity();
+            correoInput.setCustomValidity("Correo no válido. Ejemplo de formato: usuario@dominio.com");
+            correoInput.reportValidity();  // Activar el comportamiento de validación
         } else {
             correoInput.setCustomValidity("");  // Restablecer el mensaje de error si es válido
-            correoError.textContent = "";  // Limpiar el mensaje de error
         }
     }
 

@@ -119,7 +119,7 @@
                     <td>${specialist["Precio de consulta"]}</td> <!-- Mostrar precio de consulta -->
                     <td>
                         <button
-                            onclick="selectSpecialist('${specialist.nombre} ${specialist.especialidad}', '${specialist.rut}')"
+                            onclick="selectSpecialist('${specialist.nombre} ${specialist.especialidad}', '${specialist.rut}', '${specialist["Precio de consulta"]}')"
                             class="btn btn-primary btn-sm select-btn">
                             Seleccionar
                         </button>
@@ -151,9 +151,10 @@
         document.getElementById('filterDia').addEventListener('change', applyFilters);
 
         // Function to save the selected specialist in localStorage
-        function selectSpecialist(specialistName, specialistRUT) {
-            localStorage.setItem('selectedSpecialistName', specialistName);
+        function selectSpecialist(specialistName, specialistRUT, specialistPrice) {
+            localStorage.setItem('selectedSpecialist', specialistName);
             localStorage.setItem('selectedSpecialistRUT', specialistRUT);
+            localStorage.setItem('selectedSpecialistPrice', specialistPrice); // Guardar el precio
             window.location.href = "{{ url_for('views.reservas') }}";
         }
 

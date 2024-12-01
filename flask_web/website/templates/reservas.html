@@ -150,11 +150,12 @@
 
         <label>Especialista:</label>
         <p id="selected-specialist">Especialista no seleccionado</p>
-
+        <label>Precio de la Consulta:</label>
+        <p id="consulta-precio">Precio no disponible</p>
         <div class="button-container">
             <button type="button" onclick="saveFormData(); location.href='{{ url_for('views.especialistas') }}'" class="view-specialists-btn">
                 Ver Especialistas
-            </button>            
+            </button>
             <button type="submit" class="reserve-btn">Reservar Cita</button>
         </div>
     </form>
@@ -245,7 +246,10 @@
         document.getElementById('motivo').value = formData.motivo || '';
 
         const selectedSpecialist = localStorage.getItem('selectedSpecialist') || 'Especialista no seleccionado';
-        document.getElementById('selected-specialist').textContent = selectedName;
+        document.getElementById('selected-specialist').textContent = selectedSpecialist;
+
+        const selectedPrice = localStorage.getItem('selectedSpecialistPrice') || 'Precio no disponible'; // Obtener el precio
+        document.getElementById('consulta-precio').textContent = selectedPrice; // Mostrar el precio
     }
 
     function generarIdCita(event) {
@@ -256,12 +260,12 @@
             alert('Por favor, seleccione un especialista antes de reservar la cita.');
             return;
         }
-        
+
 
         const formData = JSON.parse(localStorage.getItem('formData') || '{}');
         formData.specialist = selectedRUT;
 
-        
+
         const idCita = Math.random().toString(36).substring(2, 10).toUpperCase();
         formData.idCita = idCita;
 

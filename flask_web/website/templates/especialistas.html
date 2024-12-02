@@ -110,16 +110,21 @@
             data.forEach(specialist => {
                 const row = document.createElement('tr');
 
+                const formattedPrice = new Intl.NumberFormat('es-CL', {
+                    style: 'currency',
+                    currency: 'CLP'
+                }).format(specialist["Precio de consulta"]); // Formatear el precio
+
                 row.innerHTML = `
                     <td>${specialist.nombre}</td>
                     <td>${specialist.especialidad}</td>
                     <td>${specialist.dia}</td>
                     <td>${specialist.horario}</td>
                     <td>${specialist.rut}</td>
-                    <td>${specialist["Precio de consulta"]}</td> <!-- Mostrar precio de consulta -->
+                    <td>${formattedPrice}</td> <!-- Mostrar precio de consulta formateado -->
                     <td>
                         <button
-                            onclick="selectSpecialist('${specialist.nombre} ${specialist.especialidad}', '${specialist.rut}', '${specialist["Precio de consulta"]}')"
+                            onclick="selectSpecialist('${specialist.nombre} ${specialist.especialidad}', '${specialist.rut}', '${formattedPrice}')"
                             class="btn btn-primary btn-sm select-btn">
                             Seleccionar
                         </button>

@@ -278,11 +278,9 @@
             if (data.status === "error") {
                 alert("Hubo un error al registrar la cita.");
             } else {
-                document.getElementById("idCita").style.display = 'block';
-                document.getElementById("citaId").innerText = idCita;
+                window.location.href = `/resumen/${idCita}`; // Redirigir a la página de resumen
             }
 
-            // Limpiar localStorage después de la reserva
             localStorage.removeItem('formData');
             localStorage.removeItem('selectedSpecialist');
         })
@@ -290,6 +288,7 @@
             console.error('Error:', error);
             alert('Ocurrió un error al registrar la cita.');
         });
+
 
         document.getElementById("formulario").reset();
     }

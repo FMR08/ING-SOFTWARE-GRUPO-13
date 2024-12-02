@@ -134,6 +134,24 @@ def registrar_usuario():
         print(f"Error interno del servidor: {e}")
         return jsonify({"message": "Ocurrió un error interno", "error": str(e)}), 500
 
+@views.route('/resumen/<id_cita>')
+def resumen(id_cita):
+    cursor = db.database.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT c.id, c.fecha, c.hora, c.motivo, 
+               m.nombre AS especialista, m.precio_consulta 
+        FROM citas c 
+        JOIN medico m ON c.medico = m.rut 
+        WHERE c.id = %s
+    """, (id_cita,))
+    cita = cursor.fetchone()
+    cursor.close()
+
+    if not cita:
+        return "Cita no encontrada", 404
+
+    return render_template("resumen.html", cita=cita)
+
 
 @views.route('/sign-up')
 def registrarse():

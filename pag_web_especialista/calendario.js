@@ -3,6 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const monthSelector = document.getElementById("month-selector");
     const calendarGrid = document.querySelector(".calendar-grid");
 
+    let horarios = {}; // Aquí se guardarán los horarios traídos de la API
+
+    const fetchHorarios = async () => {
+        try {
+            const response = await fetch("/api/horarios");
+            horarios = await response.json();
+        } catch (error) {
+            console.error("Error al obtener los horarios:", error);
+        }
+    };
+
     const generateCalendar = (year, month) => {
         // Limpia el calendario anterior
         const days = calendarGrid.querySelectorAll(".day-cell");
@@ -21,17 +32,32 @@ document.addEventListener("DOMContentLoaded", () => {
             calendarGrid.appendChild(emptyCell);
         }
 
-        // Agrega días del mes
+        // Agrega días del mes con horarios
         for (let day = 1; day <= daysInMonth; day++) {
             const dayCell = document.createElement("div");
             dayCell.classList.add("day-cell");
             dayCell.textContent = day;
+
+            const fecha = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+            if (horarios[fecha]) {
+                const horariosList = document.createElement("ul");
+                horariosList.classList.add("horarios-list");
+
+                horarios[fecha].forEach(horario => {
+                    const horarioItem = document.createElement("li");
+                    horarioItem.textContent = `${horario.hora} - ${horario.paciente}`;
+                    horariosList.appendChild(horarioItem);
+                });
+
+                dayCell.appendChild(horariosList);
+            }
+
             calendarGrid.appendChild(dayCell);
         }
     };
 
     // Población de selectores
-    for (let year = 2023; year <= 2030; year++) {
+    for (let year = 2024; year <= 3000; year++) {
         const option = document.createElement("option");
         option.value = year;
         option.textContent = year;
@@ -54,14 +80,15 @@ document.addEventListener("DOMContentLoaded", () => {
         generateCalendar(parseInt(yearSelector.value), parseInt(monthSelector.value));
     });
 
-    // Inicializa con el mes actual
-    const currentDate = new Date();
-    yearSelector.value = currentDate.getFullYear();
-    monthSelector.value = currentDate.getMonth();
-    generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    // Inicializa el calendario
+    const initCalendar = async () => {
+        await fetchHorarios(); // Obtiene los horarios antes de generar el calendario
+        const currentDate = new Date();
+        yearSelector.value = currentDate.getFullYear();
+        monthSelector.value = currentDate.getMonth();
+        generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    };
+
+    initCalendar();
 });
 
-// Redirección al HTML de horarios
-function redirectToSchedule() {
-    window.location.href = "horarios.html";
-}

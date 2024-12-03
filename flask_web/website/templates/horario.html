@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -84,19 +83,33 @@
             color: white;
         }
 
-        .schedule-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .cita {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
         }
 
-        .schedule-inputs select,
-        .schedule-inputs input {
-            margin-top: 5px;
+        .cita hr {
+            margin-top: 10px;
+            border: 1px solid #ccc;
         }
 
-        .schedule-inputs p {
-            margin-top: 5px;
+        .cita p {
+            margin: 5px 0;
+        }
+
+        .cancel-cita-btn {
+            margin-top: 10px;
+        }
+
+        .calendar-header button {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -106,11 +119,11 @@
         <a href="{{ url_for('views.home') }}" class="btn btn-primary back-button">Volver al Inicio</a>
 
         <div class="calendar-header">
+            <button class="btn btn-outline-secondary" id="prev-month-btn">&lt;</button>
+            
             <div>
                 <label for="year-select">Año:</label>
-                <select id="year-select" onchange="actualizarCalendario()">
-                </select>
-
+                <select id="year-select" onchange="actualizarCalendario()"></select>
                 <label for="month-select">Mes:</label>
                 <select id="month-select" onchange="actualizarCalendario()">
                     <option value="0">Enero</option>
@@ -127,6 +140,8 @@
                     <option value="11">Diciembre</option>
                 </select>
             </div>
+        
+            <button class="btn btn-outline-secondary" id="next-month-btn">&gt;</button>
         </div>
 
         <div class="calendar-grid">
@@ -143,46 +158,39 @@
 
         <div class="schedule-panel" id="schedule-panel">
             <h5 id="selected-day"></h5>
-            <div id="schedule-inputs" class="schedule-inputs">
-                <label for="hour-select">Selecciona una hora:</label>
-                <select id="hour-select" onchange="mostrarMensajeHora()">
-                    <option value="">Seleccionar hora</option>
-                    <option value="8">8:00 AM</option>
-                    <option value="9">9:00 AM</option>
-                    <option value="10">10:00 AM</option>
-                    <option value="11">11:00 AM</option>
-                    <option value="12">12:00 PM</option>
-                    <option value="13">1:00 PM</option>
-                    <option value="14">2:00 PM</option>
-                    <option value="15">3:00 PM</option>
-                    <option value="16">4:00 PM</option>
-                    <option value="17">5:00 PM</option>
-                    <option value="18">6:00 PM</option>
-                    <option value="19">7:00 PM</option>
-                    <option value="20">8:00 PM</option>
-                    <option value="21">9:00 PM</option>
-                    <option value="22">10:00 PM</option>
-                </select>
+            <div id="citas-container">
+                <p>Selecciona un día para ver las citas agendadas.</p>
+            </div>
+        </div>
 
-                <div id="message-container" style="display: none;">
-                    <label for="message-input">¿Qué vas a hacer a esta hora?</label>
-                    <input type="text" id="message-input" class="form-control">
-                    <button id="save-message" class="btn btn-primary mt-3" onclick="guardarMensaje()">Guardar</button>
+        <!-- Modal para cancelar la cita -->
+        <div class="modal" tabindex="-1" id="cancelCitaModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cancelar Cita</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="motivo">Motivo de la cancelación (máximo 250 caracteres):</label>
+                        <textarea id="motivo-cancelacion" class="form-control" rows="5" maxlength="1000"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-danger" id="confirmar-cancelacion-btn">Confirmar Cancelación</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Variables globales
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         const maxYear = 2030;
         const minYear = 2023;
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        const horariosPorDia = {}; // Almacena los horarios por día (año, mes, día)
 
-        // Generar opciones para el selector de años
         const yearSelect = document.getElementById('year-select');
         for (let year = minYear; year <= maxYear; year++) {
             const option = document.createElement('option');
@@ -191,7 +199,6 @@
             yearSelect.appendChild(option);
         }
 
-        // Generar calendario
         function generarCalendario(mes, año) {
             const calendarDays = document.getElementById("calendar-days");
             calendarDays.innerHTML = '';
@@ -209,76 +216,118 @@
                 const dayCell = document.createElement("div");
                 dayCell.classList.add("day-cell");
                 dayCell.textContent = dia;
-                dayCell.onclick = () => mostrarHorarios(dia, mes, año);
+                dayCell.onclick = () => mostrarCitas(dia, mes, año);
                 calendarDays.appendChild(dayCell);
             }
         }
 
-        // Función para actualizar el calendario
         function actualizarCalendario() {
             const selectedYear = parseInt(yearSelect.value);
             const selectedMonth = parseInt(document.getElementById('month-select').value);
             generarCalendario(selectedMonth, selectedYear);
         }
 
-        // Función para mostrar horarios
-        function mostrarHorarios(dia, mes, año) {
+        function mostrarCitas(dia, mes, año) {
             const panel = document.getElementById("schedule-panel");
             const titulo = document.getElementById("selected-day");
-            const messageContainer = document.getElementById("message-container");
-
-            titulo.textContent = `Horarios para el día ${dia} de ${meses[mes]} ${año}`;
+            titulo.textContent = `Citas para el día ${dia} de ${meses[mes]} ${año}`;
             panel.style.display = "block";
 
-            // Recuperar la información almacenada
-            if (!horariosPorDia[año]) horariosPorDia[año] = {};
-            if (!horariosPorDia[año][mes]) horariosPorDia[año][mes] = {};
-            if (!horariosPorDia[año][mes][dia]) horariosPorDia[año][mes][dia] = {};
+            fetch(`/obtenerCitasDia?fecha=${año}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`)
+                .then(response => response.json())
+                .then(data => {
+                    const citasContainer = document.getElementById('citas-container');
+                    citasContainer.innerHTML = '';
 
-            document.getElementById("hour-select").value = ""; // Resetear selección de hora
-            messageContainer.style.display = "none"; // Ocultar mensaje
-
-            // Guardar los datos de los horarios seleccionados
-            document.getElementById("hour-select").onchange = function () {
-                mostrarMensajeHora(dia, mes, año);
-            };
+                    if (data.citas.length === 0) {
+                        citasContainer.innerHTML = '<p>No hay citas para este día.</p>';
+                    } else {
+                        data.citas.forEach(cita => {
+                            citasContainer.innerHTML += `
+                                <div class="cita">
+                                    <p><strong>ID de cita:</strong> ${cita.id}</p>
+                                    <p><strong>Hora:</strong> ${cita.hora}</p>
+                                    <p><strong>Paciente:</strong> ${cita.paciente}</p>
+                                    <p><strong>Motivo:</strong> ${cita.motivo}</p>
+                                    <button class="btn btn-danger cancel-cita-btn" onclick="cancelarCita('${cita.id}')">Cancelar Cita</button>
+                                    <hr />
+                                </div>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => console.error('Error al cargar citas:', error));
         }
 
-        // Mostrar mensaje de la hora seleccionada
-        function mostrarMensajeHora(dia, mes, año) {
-            const selectedHour = parseInt(document.getElementById("hour-select").value);
-            const messageInput = document.getElementById("message-input");
-            const messageContainer = document.getElementById("message-container");
+        function cancelarCita(id) {
+            console.log('debug printb');
+            // Mostrar el modal de cancelación
+            const modal = new bootstrap.Modal(document.getElementById('cancelCitaModal'));
+            modal.show();
 
-            if (selectedHour) {
-                messageContainer.style.display = "block";
+            // Configurar el botón de confirmación para cancelar la cita
+            const confirmarCancelacionBtn = document.getElementById('confirmar-cancelacion-btn');
+            confirmarCancelacionBtn.onclick = function() {
+                const motivo = document.getElementById('motivo-cancelacion').value;
+                if (motivo.length > 200) {
+                    alert('El motivo no puede tener más de 200 palabras.');
+                    return;
+                }
 
-                const storedMessage = horariosPorDia[año][mes][dia][selectedHour];
-                messageInput.value = storedMessage || ""; // Mostrar mensaje si existe, o campo vacío
-
-                document.getElementById("save-message").onclick = function () {
-                    guardarMensaje(dia, mes, año, selectedHour, messageInput.value);
-                };
+                if (confirm('¿Está seguro de que desea cancelar esta cita?')) {
+                    // Realizar la cancelación llamando al backend
+                    fetch(`/cancelarCita?id=${id}&motivo=${encodeURIComponent(motivo)}`, {
+                        method: 'POST'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('La cita ha sido cancelada exitosamente.');
+                            location.reload(); // Recargar la página para actualizar las citas
+                        } else {
+                            alert('Error al cancelar la cita.');
+                        }
+                    })
+                    .catch(error => console.error('Error al cancelar la cita:', error));
+                }
             }
         }
+        // Función para manejar el cambio de mes con las flechas
+        function cambiarMes(incremento) {
+            currentMonth += incremento;
 
-        // Función para guardar el mensaje
-        function guardarMensaje(dia, mes, año, hora, mensaje) {
-            if (!horariosPorDia[año]) horariosPorDia[año] = {};
-            if (!horariosPorDia[año][mes]) horariosPorDia[año][mes] = {};
-            if (!horariosPorDia[año][mes][dia]) horariosPorDia[año][mes][dia] = {};
+            // Si el mes es menor que 0, pasamos al año anterior
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+                if (currentYear < minYear) {
+                    currentYear = minYear;
+                    currentMonth = 0; // Evita que se vaya fuera del rango permitido
+                }
+            }
 
-            horariosPorDia[año][mes][dia][hora] = mensaje;
-
-            alert("Horario guardado!");
+            // Si el mes es mayor que 11, pasamos al año siguiente
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+                if (currentYear > maxYear) {
+                    currentYear = maxYear;
+                    currentMonth = 11; // Evita que se vaya fuera del rango permitido
+                }
+            }
+            yearSelect.value = currentYear;
+            document.getElementById('month-select').value = currentMonth;
+            generarCalendario(currentMonth, currentYear);
         }
 
-        // Inicialización
+        document.getElementById('prev-month-btn').onclick = () => cambiarMes(-1);
+        document.getElementById('next-month-btn').onclick = () => cambiarMes(1);
+
+
         yearSelect.value = currentYear;
         document.getElementById('month-select').value = currentMonth;
         generarCalendario(currentMonth, currentYear);
-
     </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

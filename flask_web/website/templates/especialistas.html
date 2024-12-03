@@ -23,6 +23,24 @@
     <div class="container">
         <h1 class="text-center">Horarios Disponibles de Médicos</h1>
 
+        <!-- Filtros -->
+        <div class="filters d-flex justify-content-between">
+            <div>
+                <label for="filterEspecialidad" class="form-label">Especialidad:</label>
+                <select id="filterEspecialidad" class="form-select">
+                    <option value="">Todas</option>
+                    <!-- Opciones dinámicas -->
+                </select>
+            </div>
+            <div>
+                <label for="filterDia" class="form-label">Día:</label>
+                <select id="filterDia" class="form-select">
+                    <option value="">Todos</option>
+                    <!-- Opciones dinámicas -->
+                </select>
+            </div>
+        </div>
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -30,31 +48,13 @@
                     <th>Especialidad</th>
                     <th>Día</th>
                     <th>Horario Disponible</th>
+                    <th>RUT</th>
+                    <th>Precio de Consulta</th>
                     <th>Seleccionar</th>
                 </tr>
             </thead>
             <tbody id="scheduleTable">
-                <tr>
-                    <td>Dr. Juan Pérez</td>
-                    <td>Cardiología</td>
-                    <td>Lunes</td>
-                    <td>10:00 AM - 11:00 AM</td>
-                    <td><button onclick="selectSpecialist('Dr. Juan Pérez - Cardiología')" class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
-                </tr>
-                <tr>
-                    <td>Dra. Ana López</td>
-                    <td>Pediatría</td>
-                    <td>Martes</td>
-                    <td>11:30 AM - 12:30 PM</td>
-                    <td><button onclick="selectSpecialist('Dra. Ana López - Pediatría')" class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
-                </tr>
-                <tr>
-                    <td>Dr. Carlos García</td>
-                    <td>Dermatología</td>
-                    <td>Miércoles</td>
-                    <td>9:00 AM - 10:00 AM</td>
-                    <td><button onclick="selectSpecialist('Dr. Carlos García - Dermatología')" class="btn btn-primary btn-sm select-btn">Seleccionar</button></td>
-                </tr>
+                <!-- Rows will be populated dynamically -->
             </tbody>
         </table>
 
@@ -62,10 +62,110 @@
     </div>
 
     <script>
-        function selectSpecialist(specialistName) {
+        let specialistsData = [];
+
+        // Function to fetch data from /obtenerEspecialistas
+        async function loadSpecialists() {
+            try {
+                const response = await fetch('/obtenerEspecialistas');
+                if (!response.ok) throw new Error('Error fetching data');
+
+                specialistsData = await response.json();
+
+                populateFilters();
+                renderTable(specialistsData);
+            } catch (error) {
+                console.error('Error loading specialists:', error);
+            }
+        }
+
+        // Populate filter options
+        function populateFilters() {
+            const especialidades = [...new Set(specialistsData.map(s => s.especialidad))];
+            const dias = [...new Set(specialistsData.map(s => s.dia))];
+
+            const filterEspecialidad = document.getElementById('filterEspecialidad');
+            const filterDia = document.getElementById('filterDia');
+
+            especialidades.forEach(especialidad => {
+                const option = document.createElement('option');
+                option.value = especialidad;
+                option.textContent = especialidad;
+                filterEspecialidad.appendChild(option);
+            });
+
+            dias.forEach(dia => {
+                const option = document.createElement('option');
+                option.value = dia;
+                option.textContent = dia;
+                filterDia.appendChild(option);
+            });
+        }
+
+        // Render the table based on filters
+        function renderTable(data) {
+            const tableBody = document.getElementById('scheduleTable');
+            tableBody.innerHTML = '';
+
+            data.forEach(specialist => {
+                const row = document.createElement('tr');
+
+                const formattedPrice = new Intl.NumberFormat('es-CL', {
+                    style: 'currency',
+                    currency: 'CLP'
+                }).format(specialist["Precio de consulta"]); // Formatear el precio
+
+                row.innerHTML = `
+                    <td>${specialist.nombre}</td>
+                    <td>${specialist.especialidad}</td>
+                    <td>${specialist.dia}</td>
+                    <td>${specialist.horario}</td>
+                    <td>${specialist.rut}</td>
+                    <td>${formattedPrice}</td> <!-- Mostrar precio de consulta formateado -->
+                    <td>
+                        <button
+                            onclick="selectSpecialist('${specialist.nombre} ${specialist.especialidad}', '${specialist.rut}', '${formattedPrice}')"
+                            class="btn btn-primary btn-sm select-btn">
+                            Seleccionar
+                        </button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+
+        // Apply filters
+        function applyFilters() {
+            const filterEspecialidad = document.getElementById('filterEspecialidad').value;
+            const filterDia = document.getElementById('filterDia').value;
+
+            const filteredData = specialistsData.filter(specialist => {
+                return (
+                    (filterEspecialidad === '' || specialist.especialidad === filterEspecialidad) &&
+                    (filterDia === '' || specialist.dia === filterDia)
+                );
+            });
+
+            renderTable(filteredData);
+        }
+
+        // Event listeners for filters
+        document.getElementById('filterEspecialidad').addEventListener('change', applyFilters);
+        document.getElementById('filterDia').addEventListener('change', applyFilters);
+
+        // Function to save the selected specialist in localStorage
+        function selectSpecialist(specialistName, specialistRUT, specialistPrice) {
             localStorage.setItem('selectedSpecialist', specialistName);
+            localStorage.setItem('selectedSpecialistRUT', specialistRUT);
+            localStorage.setItem('selectedSpecialistPrice', specialistPrice); // Guardar el precio
             window.location.href = "{{ url_for('views.reservas') }}";
         }
+
+        // Load specialists when the page loads
+        document.addEventListener('DOMContentLoaded', loadSpecialists);
     </script>
 </body>
 </html>
+

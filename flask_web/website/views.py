@@ -18,10 +18,26 @@ def obtener_citas_dia():
 
     return jsonify({"citas": citas})
 
+@views.route('/obtenerFechasCitasMes')
+def obtener_fecha_de_citas_mes():
+    print("obtenerFechasCitasMes")#debug
+    año =request.args.get('año')
+    mes =request.args.get('mes')
+    print("año"+str(año)+" mes"+str(mes))
+    cursor = db.database.cursor()
+    cursor.execute("SELECT fecha FROM citas WHERE YEAR(fecha) = %s AND MONTH(fecha)= %s", (año,mes))
+    rows = cursor.fetchall()
+    cursor.close()
+    fechas_list = [fecha[0] for fecha in rows]
+    print(fechas_list) #debug
+    return jsonify({"fechas": fechas_list})
+
 
 #Se ha añadido precio_consulta
 @views.route('/obtenerEspecialistas')
 def obtener_especialistas():
+    print("obtenerEspecialistas")#debug
+
     cursor = db.database.cursor(dictionary=True)
     cursor.execute("SELECT rut,nombre,especialidad,dia,horario_inicio,horario_fin, precio_consulta FROM medico")
     results = cursor.fetchall()
@@ -47,12 +63,12 @@ def home():
 @views.route('/book')
 def reservas():
     return render_template("reservas.html")
-    
+
 def correo_valido(correo):
     # Expresión regular para validar correos electrónicos
     patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(patron, correo) is not None
-    
+
 @views.route('/subirReserva', methods=['POST'])
 def submit_form():
     data = request.get_json()  # Parse the JSON data sent by JavaScript
@@ -116,7 +132,7 @@ def registrar_usuario():
         telefono = data.get('telefono')
         contraseña = data.get('contraseña')
         rut = data.get('rut')
-        
+
         if not all([nombre, apellidos, correo, telefono, contraseña, rut]):
             return jsonify({"message": "Todos los campos son obligatorios"}), 400
 

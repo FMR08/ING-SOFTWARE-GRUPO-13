@@ -200,6 +200,7 @@
         }
 
         function generarCalendario(mes, año) {
+            console.log("test")//debug
             const calendarDays = document.getElementById("calendar-days");
             calendarDays.innerHTML = '';
 
@@ -211,14 +212,27 @@
                 const emptyCell = document.createElement("div");
                 calendarDays.appendChild(emptyCell);
             }
+            fetch(`/obtenerFechasCitasMes?mes=${mes+1}&año=${año}`)
+                .then(response => response.json())
+                .then(data => {
+                    const fechasOcupadas = data.fechas;
+                    console.log("Fechas Ocupadas:", fechasOcupadas); //debug
+                    for (let dia = 1; dia <= totalDias; dia++) {
+                        const dayCell = document.createElement("div");
+                        dayCell.classList.add("day-cell");
+                        dayCell.textContent = dia;
+                        dayCell.onclick = () => mostrarCitas(dia, mes, año);
+                        const fecha = `${año}-${String(mes+1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                        console.log("looking at date ",fecha);//debug
+                        if(fechasOcupadas.includes(fecha)){
+                            dayCell.style.backgroundColor = "pink";
+                        }
 
-            for (let dia = 1; dia <= totalDias; dia++) {
-                const dayCell = document.createElement("div");
-                dayCell.classList.add("day-cell");
-                dayCell.textContent = dia;
-                dayCell.onclick = () => mostrarCitas(dia, mes, año);
-                calendarDays.appendChild(dayCell);
-            }
+                        calendarDays.appendChild(dayCell);
+                    }
+                })
+                .catch(error => console.error('Error al cargar citas:', error));
+
         }
 
         function actualizarCalendario() {

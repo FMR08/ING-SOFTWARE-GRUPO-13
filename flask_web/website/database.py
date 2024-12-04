@@ -153,8 +153,8 @@ def buscar_paciente(rut):
         paciente = Paciente(rows[0][0], rows[0][1], rows[0][2], rows[0][3],rows[0][4])
         return paciente  
     else:
-        return None
         print("Paciente no encontrado.")
+        return None
     cursor.close()
 
 def buscar_usuarios(rut):

@@ -14,7 +14,7 @@ def obtener_citas_dia():
 
     # Modificar nombres de columnas según la estructura de la tabla
     for cita in citas:
-        cita['paciente'] = db.buscar_paciente(cita['paciente_rut']).nombre
+        cita['paciente'] = db.buscar_paciente(cita['paciente']).nombre
 
     return jsonify({"citas": citas})
 

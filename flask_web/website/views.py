@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
 from flask_web.website import database as db
+import pymysql
 from flask_web.website import utils
 import re
 
@@ -7,7 +8,7 @@ views = Blueprint('views', __name__)
 @views.route('/obtenerCitasDia')
 def obtener_citas_dia():
     fecha = request.args.get('fecha')
-    cursor = db.database.cursor(dictionary=True)
+    cursor = db.database.cursor(pymysql.cursors.DictCursor)
     cursor.execute("SELECT * FROM citas WHERE fecha = %s AND estado != 'cancelada'", (fecha,))
     citas = cursor.fetchall()
     cursor.close()
@@ -28,7 +29,7 @@ def obtener_fecha_de_citas_mes():
     cursor.execute("SELECT fecha FROM citas WHERE YEAR(fecha) = %s AND MONTH(fecha)= %s", (año,mes))
     rows = cursor.fetchall()
     cursor.close()
-    fechas_list = [fecha[0] for fecha in rows]
+    fechas_list = [fecha[0].strftime('%Y-%m-%d') for fecha in rows]
     print(fechas_list) #debug
     return jsonify({"fechas": fechas_list})
 
@@ -38,7 +39,7 @@ def obtener_fecha_de_citas_mes():
 def obtener_especialistas():
     print("obtenerEspecialistas")#debug
 
-    cursor = db.database.cursor(dictionary=True)
+    cursor = db.database.cursor(pymysql.cursors.DictCursor)
     cursor.execute("SELECT rut,nombre,especialidad,dia,horario_inicio,horario_fin, precio_consulta FROM medico")
     results = cursor.fetchall()
     especialistas = [
@@ -152,7 +153,7 @@ def registrar_usuario():
 
 @views.route('/resumen/<id_cita>')
 def resumen(id_cita):
-    cursor = db.database.cursor(dictionary=True)
+    cursor = db.database.cursor(pymysql.cursors.DictCursor)
     cursor.execute("""
         SELECT c.id, c.fecha, c.hora, c.motivo, 
                m.nombre AS especialista, m.precio_consulta 

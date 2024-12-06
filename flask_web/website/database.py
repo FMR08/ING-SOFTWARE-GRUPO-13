@@ -1,15 +1,16 @@
-import mysql.connector
+#import mysql.connector
+import pymysql
 import smtplib
 from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import re
 
-database = mysql.connector.connect(
-    host='sql10.freemysqlhosting.net',
-    user='sql10748269',
-    password='EI4pljbcyV',
-    database='sql10748269'
+database = pymysql.connect(
+    host='192.168.50.206',
+    user='app',
+    password='12345',
+    database='appdb1234'
 )
 class Usuarios:
     def __init__(self, rut, nombre,apellido, email, telefono, contraseña):
@@ -129,13 +130,14 @@ def insertar_medico(rut, nombre, correo, contraseña, especialidad, dia, horario
     #database.close()
 
 def insertar_cita(id, run_medico, run_paciente, hora, fecha, motivo,estado):
+    print( "(%s, %s, %s, %s, %s, %s, %s)", (id, run_medico, run_paciente, hora, fecha, motivo, estado))
     cursor = database.cursor()
     cursor.execute("INSERT INTO citas (id, medico, paciente, hora, fecha, motivo, estado) VALUES (%s, %s, %s, %s, %s, %s, %s)", (id, run_medico, run_paciente, hora, fecha, motivo, estado))
     database.commit()
     #print("Cita "+ id + " insertada")
     paciente =buscar_paciente(run_paciente)
     medico = buscar_medico(run_medico)
-    mensaje(paciente.nombre,paciente.apellido,paciente.email,id,fecha,hora,motivo,medico.nombre)
+    #mensaje(paciente.nombre,paciente.apellido,paciente.email,id,fecha,hora,motivo,medico.nombre)
     cursor.close()
     #database.close()
 
@@ -254,7 +256,5 @@ def mensaje(nombre,apellido, destinatario, cita_id, fecha, hora, motivo, medico)
 
 
 if __name__ == '__main__':
-
-  
     ver_tablas()
     database.close()

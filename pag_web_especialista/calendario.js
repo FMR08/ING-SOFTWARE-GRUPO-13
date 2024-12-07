@@ -7,14 +7,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const fetchHorarios = async () => {
         try {
+            console.log("Obteniendo horarios...");
             const response = await fetch("/api/horarios");
-            horarios = await response.json();
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("Horarios recibidos:", data);
+            horarios = data;
         } catch (error) {
             console.error("Error al obtener los horarios:", error);
+            horarios = {};
         }
     };
 
     const generateCalendar = (year, month) => {
+        console.log("Generando calendario para:", year, month);
         // Limpia el calendario anterior
         const days = calendarGrid.querySelectorAll(".day-cell");
         days.forEach(day => day.remove());
@@ -28,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Agrega celdas vacías para días previos al inicio del mes
         for (let i = 0; i < adjustedFirstDay; i++) {
             const emptyCell = document.createElement("div");
-            emptyCell.classList.add("day-cell", "empty-cell");
+            emptyCell.classList.add("day-cell", "empty");
             calendarGrid.appendChild(emptyCell);
         }
 
@@ -36,20 +44,30 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let day = 1; day <= daysInMonth; day++) {
             const dayCell = document.createElement("div");
             dayCell.classList.add("day-cell");
-            dayCell.textContent = day;
+            
+            // Contenedor para el número del día
+            const dayNumber = document.createElement("div");
+            dayNumber.classList.add("day-number");
+            dayNumber.textContent = day;
+            dayCell.appendChild(dayNumber);
 
+            // Verificar si hay citas para este día
             const fecha = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-            if (horarios[fecha]) {
-                const horariosList = document.createElement("ul");
-                horariosList.classList.add("horarios-list");
+            console.log("Verificando fecha:", fecha);
+            
+            if (horarios[fecha] && horarios[fecha].length > 0) {
+                console.log("Citas encontradas para", fecha, ":", horarios[fecha]);
+                const citasList = document.createElement("div");
+                citasList.classList.add("citas-list");
 
-                horarios[fecha].forEach(horario => {
-                    const horarioItem = document.createElement("li");
-                    horarioItem.textContent = `${horario.hora} - ${horario.paciente}`;
-                    horariosList.appendChild(horarioItem);
+                horarios[fecha].forEach(cita => {
+                    const citaItem = document.createElement("div");
+                    citaItem.classList.add("cita-item");
+                    citaItem.textContent = `${cita.hora} - ${cita.paciente}`;
+                    citasList.appendChild(citaItem);
                 });
 
-                dayCell.appendChild(horariosList);
+                dayCell.appendChild(citasList);
             }
 
             calendarGrid.appendChild(dayCell);
@@ -57,7 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // Población de selectores
-    for (let year = 2024; year <= 3000; year++) {
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year <= currentYear + 5; year++) {
         const option = document.createElement("option");
         option.value = year;
         option.textContent = year;
@@ -67,22 +86,25 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let month = 0; month < 12; month++) {
         const option = document.createElement("option");
         option.value = month;
-        option.textContent = new Date(0, month).toLocaleString("es", { month: "long" });
+        option.textContent = new Date(2000, month).toLocaleString("es", { month: "long" });
         monthSelector.appendChild(option);
     }
 
     // Eventos para cambiar mes/año
-    yearSelector.addEventListener("change", () => {
+    yearSelector.addEventListener("change", async () => {
+        await fetchHorarios();
         generateCalendar(parseInt(yearSelector.value), parseInt(monthSelector.value));
     });
 
-    monthSelector.addEventListener("change", () => {
+    monthSelector.addEventListener("change", async () => {
+        await fetchHorarios();
         generateCalendar(parseInt(yearSelector.value), parseInt(monthSelector.value));
     });
 
     // Inicializa el calendario
     const initCalendar = async () => {
-        await fetchHorarios(); // Obtiene los horarios antes de generar el calendario
+        console.log("Inicializando calendario...");
+        await fetchHorarios();
         const currentDate = new Date();
         yearSelector.value = currentDate.getFullYear();
         monthSelector.value = currentDate.getMonth();

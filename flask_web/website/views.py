@@ -185,3 +185,34 @@ def lista_especialistas():
 @views.route('/schedule')
 def horario():
     return render_template("horario.html")
+
+@views.route('/api/horarios')
+def obtener_horarios():
+    try:
+        cursor = db.database.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT c.fecha, c.hora, p.nombre as paciente, m.nombre as medico 
+            FROM citas c
+            JOIN paciente p ON c.paciente = p.rut
+            JOIN medico m ON c.medico = m.rut
+            WHERE c.estado != 'cancelada'
+        """)
+        citas = cursor.fetchall()
+        cursor.close()
+
+        # Organizar las citas por fecha
+        horarios = {}
+        for cita in citas:
+            fecha = cita['fecha'].strftime('%Y-%m-%d')
+            if fecha not in horarios:
+                horarios[fecha] = []
+            horarios[fecha].append({
+                'hora': str(cita['hora']),  # Convertir a string para serialización JSON
+                'paciente': cita['paciente'],
+                'medico': cita['medico']
+            })
+
+        return jsonify(horarios)
+    except Exception as e:
+        print(f"Error al obtener horarios: {str(e)}")
+        return jsonify({}), 500

@@ -1,0 +1,125 @@
+/* Estilos del calendario */
+.calendar-container {
+    text-align: center;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #000000;
+    color: #050505;
+    background-image: url('../imagenes/A.jpg');/* Ruta de tu imagen */
+    background-size: cover;  /* La imagen cubre toda la pantalla */
+    background-position: center;  /* Centra la imagen */
+    background-attachment: fixed;  /* Hace que la imagen no se mueva cuando se hace scroll */
+    /*filter: brightness(0.5);  /* Aplica un filtro para oscurecer la imagen */
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-header select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #9a55f5;
+    font-size: 14px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.day-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 10px;
+    background-color: #9570eb;
+    color: #070707;
+    border-radius: 8px;
+}
+
+.day-cell {
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #b668e4;
+    transition: background-color 0.3s, color 0.3s;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+}
+
+.day-cell:hover {
+    background-color: #7a5ad1;
+    color: #000000;
+}
+
+.day-number {
+    font-weight: bold;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+.citas-list {
+    margin-top: 25px;
+    font-size: 0.8em;
+    text-align: left;
+    overflow-y: auto;
+    max-height: 60px;
+    width: 100%;
+}
+
+.cita-item {
+    background-color: #9957ee;
+    padding: 3px 6px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11px;
+}
+
+.empty {
+    background-color: #d8d8d8;
+    cursor: default;
+}
+
+/* Panel de horarios */
+.schedule-panel {
+    margin-top: 20px;
+    background-color: #b186e9;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-panel h5 {
+    margin-bottom: 15px;
+    color: #000000;
+}
+
+.schedule-panel ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.schedule-panel ul li {
+    background-color: #9957ee;
+
+    margin-bottom: 10px;
+    border-radius: 8px;
+}

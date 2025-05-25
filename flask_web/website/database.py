@@ -213,8 +213,8 @@ def validar_email(email):
     return re.match(patron, email) is not None
 
 def mensaje(nombre,apellido, destinatario, cita_id, fecha, hora, motivo, medico):
-    remitente = 'correoaaa999@gmail.com'
-    password = 'gwjy txfu mozm lnmk'  # Sustituir con una contraseña segura
+    remitente = ''
+    password = ''  # Sustituir con una contraseña segura
 
     # Validar destinatario
     if not validar_email(destinatario):
